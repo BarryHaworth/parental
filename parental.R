@@ -2,6 +2,7 @@
 # 23/06/2022 - first version.  Some problems where a movie did not have all five guides.
 # 24/06/2022  Updated to return blank values if not included.
 # 26/06/2022  Moved from IMDB project to separate parental guidance project
+# 27/06/2022  Changed delimiter character with certificate from comma to | 
 
 library(rvest)
 library(dplyr)
@@ -32,7 +33,7 @@ guide_rip <- function(tconst){
        mpaa <- ""
   }
   cert_html   <- html_nodes(webpage,'.ipl-inline-list')
-  if (length(cert_html)==2){  certificate <- gsub("\n",",",html_text2(cert_html[2]))
+  if (length(cert_html)==2){  certificate <- gsub("\n","|",html_text2(cert_html[2]))
      } else {certificate <- ""}
   guide_html <- html_nodes(webpage,'.ipl-status-pill')
   if (length(guide_html)==0){
@@ -101,7 +102,8 @@ while(nrow(movie_ids)>0){
     tryCatch({
       id <- movie_ids$tconst[i]
       movieTitle <- as.character(movies %>% filter(tconst==id) %>% select(primaryTitle))
-      print(paste(i,"Movie",id,movieTitle))
+      numVotes <- as.numeric(movies %>% filter(tconst==id) %>% select(numVotes))
+      print(paste(i,"Movie",id,"votes",numVotes,movieTitle))
       parental <- bind_rows(parental,guide_rip(id))
     }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
   }
