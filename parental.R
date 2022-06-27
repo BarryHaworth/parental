@@ -28,12 +28,9 @@ guide_rip <- function(tconst){
   mpaa_html  <- html_nodes(webpage,'td')
   if (length(mpaa_html)==4){
     mpaa <- html_text(mpaa_html[2])  
-    mpaa_words <-unlist(str_split(gsub("[()]","",mpaa), " ")) 
-    mpaa_pos <- max(which(mpaa_words=="Rated"),0)
-    mpaa_rating <- mpaa_words[mpaa_pos+1]
   } else {
        mpaa <- ""
-       mpaa_rating <- ""}
+  }
   cert_html   <- html_nodes(webpage,'.ipl-inline-list')
   if (length(cert_html)==2){  certificate <- gsub("\n",",",html_text2(cert_html[2]))
      } else {certificate <- ""}
@@ -57,7 +54,7 @@ guide_rip <- function(tconst){
     intense <- html_text(guide_html[i])
   }
   guide     <- data.frame(tconst,sex,violence,profanity,drugs,intense,
-                          mpaa_rating,mpaa,certificate,stringsAsFactors=FALSE)
+                          mpaa,certificate,stringsAsFactors=FALSE)
   return(guide)
 }
 
@@ -138,7 +135,11 @@ parental_guide <- movies %>% inner_join(parental,by="tconst") %>%
                                   intense=="Severe"~4)
   )
 
-table(parental_guide$mpaa_rating)
+# Rearrange the field names
+parental_guide <- parental_guide[c("tconst","titleType","primaryTitle","originalTitle"  ,"isAdult","startYear",
+                 "runtimeMinutes", "genres","averageRating",  "numVotes"    ,   "sex" ,  "violence",      
+                 "profanity",      "drugs", "intense" ,  "sex_code",      
+                 "violence_code",  "profanity_code", "drug_code","intense_code", "mpaa" ,"certificate") ]
 
 save(parental_guide,file=paste0(DATA_DIR,"/parental_guide.Rdata"))
 write.csv(parental_guide,paste0(DATA_DIR,"/IMDB_parental_guide.csv"),row.names = FALSE)
