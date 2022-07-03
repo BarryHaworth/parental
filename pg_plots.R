@@ -23,6 +23,14 @@ table(country_certificate$country)
 cc_table <- data.frame(table(country_certificate$country)) 
 names(cc_table) <- c("country","freq")
 
+# To Do:
+# Filter countries with more than a threshold of movies Certified
+# Note: 24 countries with >10K ranked movies.
+# List the countries
+# For each country, list the major certifications.
+# Identify the ones we will work with.
+
+
 guides <- c("sex","violence","profanity","drugs","intense")  # List of Parental Guide variables
 
 parental_guide$sex       <- factor(parental_guide$sex,levels=c("None","Mild","Moderate","Severe"))
