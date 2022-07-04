@@ -59,34 +59,34 @@ guide_rip <- function(tconst){
   
   detail_html <- html_nodes(webpage,'.advisory-severity-vote__vote-button-container')
   sex_details  <- strsplit(html_text(detail_html[[1]]),"\n")[[1]]
-  sex_none     <- as.numeric(sex_details[4])
-  sex_mild     <- as.numeric(sex_details[8])
-  sex_moderate <- as.numeric(sex_details[12])
-  sex_severe   <- as.numeric(sex_details[16])
+  sex_none     <- as.numeric(gsub(",","",sex_details[4]))
+  sex_mild     <- as.numeric(gsub(",","",sex_details[8]))
+  sex_moderate <- as.numeric(gsub(",","",sex_details[12]))
+  sex_severe   <- as.numeric(gsub(",","",sex_details[16]))
   sex_total    <- sex_none+sex_mild+sex_moderate+sex_severe
   violence_details  <- strsplit(html_text(detail_html[[2]]),"\n")[[1]]
-  violence_none     <- as.numeric(violence_details[4])
-  violence_mild     <- as.numeric(violence_details[8])
-  violence_moderate <- as.numeric(violence_details[12])
-  violence_severe   <- as.numeric(violence_details[16])
+  violence_none     <- as.numeric(gsub(",","",violence_details[4]))
+  violence_mild     <- as.numeric(gsub(",","",violence_details[8]))
+  violence_moderate <- as.numeric(gsub(",","",violence_details[12]))
+  violence_severe   <- as.numeric(gsub(",","",violence_details[16]))
   violence_total    <- violence_none+violence_mild+violence_moderate+violence_severe
   profanity_details  <- strsplit(html_text(detail_html[[3]]),"\n")[[1]]
-  profanity_none     <- as.numeric(profanity_details[4])
-  profanity_mild     <- as.numeric(profanity_details[8])
-  profanity_moderate <- as.numeric(profanity_details[12])
-  profanity_severe   <- as.numeric(profanity_details[16])
+  profanity_none     <- as.numeric(gsub(",","",profanity_details[4]))
+  profanity_mild     <- as.numeric(gsub(",","",profanity_details[8]))
+  profanity_moderate <- as.numeric(gsub(",","",profanity_details[12]))
+  profanity_severe   <- as.numeric(gsub(",","",profanity_details[16]))
   profanity_total    <- profanity_none+profanity_mild+profanity_moderate+profanity_severe
   drugs_details  <- strsplit(html_text(detail_html[[4]]),"\n")[[1]]
-  drugs_none     <- as.numeric(drugs_details[4])
-  drugs_mild     <- as.numeric(drugs_details[8])
-  drugs_moderate <- as.numeric(drugs_details[12])
-  drugs_severe   <- as.numeric(drugs_details[16])
+  drugs_none     <- as.numeric(gsub(",","",drugs_details[4]))
+  drugs_mild     <- as.numeric(gsub(",","",drugs_details[8]))
+  drugs_moderate <- as.numeric(gsub(",","",drugs_details[12]))
+  drugs_severe   <- as.numeric(gsub(",","",drugs_details[16]))
   drugs_total    <- drugs_none+drugs_mild+drugs_moderate+drugs_severe
   intense_details  <- strsplit(html_text(detail_html[[5]]),"\n")[[1]]
-  intense_none     <- as.numeric(intense_details[4])
-  intense_mild     <- as.numeric(intense_details[8])
-  intense_moderate <- as.numeric(intense_details[12])
-  intense_severe   <- as.numeric(intense_details[16])
+  intense_none     <- as.numeric(gsub(",","",intense_details[4]))
+  intense_mild     <- as.numeric(gsub(",","",intense_details[8]))
+  intense_moderate <- as.numeric(gsub(",","",intense_details[12]))
+  intense_severe   <- as.numeric(gsub(",","",intense_details[16]))
   intense_total    <- intense_none+intense_mild+intense_moderate+intense_severe
   
   guide     <- data.frame(tconst,
@@ -103,7 +103,7 @@ guide_rip <- function(tconst){
 #guide_rip("tt0452694")
 #guide_rip("tt8783930")
 # Some problem movies:
-# guide_rip("tt7668842") 
+#  
 # guide_rip("tt0385267") 
 # guide_rip("tt0183869")
 # guide_rip("tt0245803")
@@ -113,7 +113,7 @@ guide_rip <- function(tconst){
 #guide_rip("tt1179782") # table is empty
 #guide_rip("tt0216707")
 #guide_rip("tt2404435")
-#guide_rip("tt5742374")
+#guide_rip("tt0944947")
 
 # Movies to get parental guides
 keeptypes <- c("movie","tvMovie","tvMiniSeries","tvSeries","videoGame")  # List of types to keep
@@ -181,9 +181,6 @@ parental_detail_guide <- movies %>% inner_join(parental_detail,by="tconst") %>%
 save(parental_detail_guide,file=paste0(DATA_DIR,"/parental_detail_guide.Rdata"))
 write.csv(parental_detail_guide,paste0(DATA_DIR,"/IMDB_parental_detail_guide.csv"),row.names = FALSE)
 
-table(parental$sex)
-table(parental$violence)
-table(parental$profanity)
-table(parental$drugs)
-table(parental$intense)
-
+summary(parental_detail_guide$sex_total)
+hist(parental_detail_guide$sex_total)
+parental_detail_guide %>% filter(is.na(sex_total))
