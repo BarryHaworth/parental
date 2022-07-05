@@ -9,7 +9,11 @@
 #  - Done for top five countries
 # 2) Plot changes in the five parental guides over time
 #  Guide by guide?
-
+# For each country, for each classification:
+#  Guide by guide stacked histogram
+# Guide by guide line plot
+#  All guides line plot
+# Country by guide ratings plot
 
 library(dplyr)
 library(ggplot2)

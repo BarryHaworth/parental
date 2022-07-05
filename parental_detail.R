@@ -181,6 +181,6 @@ parental_detail_guide <- movies %>% inner_join(parental_detail,by="tconst") %>%
 save(parental_detail_guide,file=paste0(DATA_DIR,"/parental_detail_guide.Rdata"))
 write.csv(parental_detail_guide,paste0(DATA_DIR,"/IMDB_parental_detail_guide.csv"),row.names = FALSE)
 
-summary(parental_detail_guide$sex_total)
+summary(parental_detail_guide %>% select(sex_total,violence_total, profanity_total,drugs_total,intense_total))
 hist(parental_detail_guide$sex_total)
 parental_detail_guide %>% filter(is.na(sex_total))
