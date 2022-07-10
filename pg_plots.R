@@ -26,94 +26,130 @@ PLOT_DIR    <- paste0(PROJECT_DIR,"/plot")
 load(paste0(DATA_DIR,"/parental_guide.RData"))
 load(paste0(DATA_DIR,"/country_certificate.RData"))
 
+# Load Country guides
+load(paste0(DATA_DIR,"/pg_us.RData"))
+load(paste0(DATA_DIR,"/pg_uk.RData"))
+load(paste0(DATA_DIR,"/pg_can.RData"))
+load(paste0(DATA_DIR,"/pg_aus.RData"))
+load(paste0(DATA_DIR,"/pg_deu.RData"))
+
+# Filter the Titles.  Year range 1980 - 2019.  This is the year range used by u/joker_penguin (Pablo)
+
+parental_guide <- parental_guide %>% filter(startYear>=1980 & startYear<=2019)
+table(parental_guide$startYear)
+
 names(parental_guide)
 names(country_certificate)
 
-table(country_certificate$country)
-
-cc_table <- data.frame(table(country_certificate$country)) %>% arrange(-Freq)
-names(cc_table) <- c("country","freq")
-
-head(cc_table,10)
-
-# To Do:
-# Filter countries with more than a threshold of movies Certified
-# Top five: USA, UK, Canata, Australia, Germany
-# 24 countries with >10K ranked movies.
-# List the countries
-# For each country, list the major certifications.
-# Identify the ones we will work with.
-
-
 guides <- c("sex","violence","profanity","drugs","intense")  # List of Parental Guide variables
+codes  <- c("sex_code","violence_code","profanity_code","drug_code","intense_code")  # List of Parental Guide variables
 
+# Set guides as ordered factors
 parental_guide$sex       <- factor(parental_guide$sex,levels=c("None","Mild","Moderate","Severe"))
 parental_guide$violence  <- factor(parental_guide$violence,levels=c("None","Mild","Moderate","Severe"))
 parental_guide$profanity <- factor(parental_guide$profanity,levels=c("None","Mild","Moderate","Severe"))
 parental_guide$drugs     <- factor(parental_guide$drugs,levels=c("None","Mild","Moderate","Severe"))
 parental_guide$intense   <- factor(parental_guide$intense,levels=c("None","Mild","Moderate","Severe"))
 
-summary(parental_guide %>% select(sex,violence,profanity,drugs,intense))
-
-# United States ratings
-# https://en.wikipedia.org/wiki/Motion_Picture_Association_film_rating_system
-mpaa <- c("G","PG","PG-13","R","X","NC-17")  # MPAA ratings
-cc_us <- country_certificate %>% filter(country=="United States") %>% filter(certificate %in% mpaa)
-pg_us <- parental_guide %>% select(-certificate) %>% inner_join(cc_us,by="tconst")
-
-table(pg_us$certificate)
-
-# United Kingdom
-# https://en.wikipedia.org/wiki/British_Board_of_Film_Classification
-bbfc <- c("U","PG","12A","12","15","18","R18")
-cc_uk <- country_certificate %>% filter(country=="United Kingdom") %>% filter(certificate %in% bbfc)
-pg_uk <- parental_guide %>% select(-certificate) %>% inner_join(cc_uk,by="tconst")
-
-table(pg_uk$certificate)
-
-# Canada
-# https://en.wikipedia.org/wiki/Canadian_motion_picture_rating_system
-cmprs <- c("G","PG","14A","18A","R","A","13+","16+","18+")
-cc_can <- country_certificate %>% filter(country=="Canada") %>% filter(certificate %in% cmprs)
-pg_can <- parental_guide %>% select(-certificate) %>% inner_join(cc_can,by="tconst")
-
-table(pg_can$certificate)
-
-
-# Australia
-# https://en.wikipedia.org/wiki/Australian_Classification_Board
-acb <- c("G","PG","M","MA","MA15+","R","R18+")
-cc_aus <- country_certificate %>% filter(country=="Australia") %>% filter(certificate %in% acb)
-pg_aus <- parental_guide %>% select(-certificate) %>% inner_join(cc_aus,by="tconst")
-
-table(pg_aus$certificate)
-
-
-# Germany
-# https://www.dw.com/en/how-germanys-film-age-rating-system-works/a-41551312
-fsk <- c("0","6","12","16","18")
-cc_ger <- country_certificate %>% filter(country=="Germany") %>% filter(certificate %in% fsk)
-pg_ger <- parental_guide %>% select(-certificate) %>% inner_join(cc_ger,by="tconst")
-
-table(pg_ger$certificate)
+summary(parental_guide[guides])
+summary(parental_guide[codes])
 
 # Plots
-ggplot(data=pg_us) +
-  geom_histogram((aes(x=startYear)),  fill="cornflowerblue" ,binwidth = 1)
+png(paste0(PLOT_DIR,"/total_titles.png"),width=800,height=800)
+ggplot(data=parental_guide) +
+  geom_histogram((aes(x=startYear)),  fill="cornflowerblue" ,binwidth = 1) +
+  ggtitle("Total Titles by Year 1980 - 2019")
+dev.off()
 
-ggplot(data=pg_us %>% filter(startYear>= 1970), aes(x=startYear, fill=certificate)) +
-  geom_bar()
+png(paste0(PLOT_DIR,"/total_types.png"),width=800,height=800)
+ggplot(data=parental_guide, aes(x=startYear,fill=titleType)) +
+  geom_bar() +
+  ggtitle("Titles by Type by Year 1980 - 2019")
+dev.off()
 
-ggplot(data=pg_us %>% filter(startYear>= 1970, certificate=="G",sex !=""), aes(x=startYear, fill=fct_rev(sex) )) +
-  geom_bar(position="fill")
+# Parental Guide scores by Year
 
-ggplot(data=pg_us %>% filter(startYear>= 1970, certificate=="PG",sex !=""), aes(x=startYear, fill=fct_rev(sex) )) +
-  geom_bar(position="fill")
+pg_year <- parental_guide %>% group_by(startYear) %>%
+           summarise(count = n(), 
+                     sex = mean(sex_code,na.rm=T),
+                     violence = mean(violence_code,na.rm=T),
+                     profanity = mean(profanity_code,na.rm=T),
+                     drugs = mean(drug_code,na.rm=T),
+                     intense = mean(intense_code,na.rm=T)
+                     )
 
-ggplot(data=pg_us %>% filter(startYear>= 1970, certificate=="PG-13",sex !=""), aes(x=startYear, fill=fct_rev(sex) )) +
-  geom_bar(position="fill")
+png(paste0(PLOT_DIR,"/ave_ratings.png"),width=800,height=800)
+ggplot(data=pg_year, aes(x=startYear)) +
+  geom_line(aes(y=sex,       colour="sex"),size=1) +
+  geom_line(aes(y=drugs,     colour="drugs"),size=1) +
+  geom_line(aes(y=violence,  colour="violence"),size=1) +
+  geom_line(aes(y=profanity, colour="profanity"),size=1) +
+  geom_line(aes(y=intense,   colour="intense"),size=1) +
+  ggtitle("Average Parental Guide Scores for all Titles")
+dev.off()
 
-ggplot(data=pg_us %>% filter(startYear>= 1970, certificate=="R",sex !=""), aes(x=startYear, fill=fct_rev(sex) )) +
-  geom_bar(position="fill")
+# Separate plots for different US Rating groups.
+# Note: Try redoing this as a melt
+# One plot for each guide, separate lines by rating
 
+pg_year_us <- parental_guide %>% select(-c(mpaa,certificate)) %>% 
+  inner_join(pg_us %>% select(tconst,certificate)) %>%
+  group_by(startYear, certificate) %>%
+  summarise(count = n(), 
+            sex = mean(sex_code,na.rm=T),
+            violence = mean(violence_code,na.rm=T),
+            profanity = mean(profanity_code,na.rm=T),
+            drugs = mean(drug_code,na.rm=T),
+            intense = mean(intense_code,na.rm=T)
+  )
+
+mpaa <- c("G","PG","PG-13","R","X","NC-17")  # MPAA ratings
+
+png(paste0(PLOT_DIR,"/us_rating_g.png"),width=800,height=800)
+ggplot(data=pg_year_us %>% filter(certificate=="G") , aes(x=startYear)) +
+  geom_line(aes(y=sex,       colour="sex"),size=1) +
+  geom_line(aes(y=drugs,     colour="drugs"),size=1) +
+  geom_line(aes(y=violence,  colour="violence"),size=1) +
+  geom_line(aes(y=profanity, colour="profanity"),size=1) +
+  geom_line(aes(y=intense,   colour="intense"),size=1) +
+  ggtitle("Average Parental Guide Scores for G rated Titles") +
+  xlab("Year")+ylab("Rating") +
+  theme(legend.position = "bottom")
+dev.off()
+
+png(paste0(PLOT_DIR,"/us_rating_pg.png"),width=800,height=800)
+ggplot(data=pg_year_us %>% filter(certificate=="PG") , aes(x=startYear)) +
+  geom_line(aes(y=sex,       colour="sex"),size=1) +
+  geom_line(aes(y=drugs,     colour="drugs"),size=1) +
+  geom_line(aes(y=violence,  colour="violence"),size=1) +
+  geom_line(aes(y=profanity, colour="profanity"),size=1) +
+  geom_line(aes(y=intense,   colour="intense"),size=1) +
+  ggtitle("Average Parental Guide Scores for PG rated Titles")+
+  xlab("Year")+ylab("Rating") +
+  theme(legend.position = "bottom")
+dev.off()
+
+png(paste0(PLOT_DIR,"/us_rating_pg-13.png"),width=800,height=800)
+ggplot(data=pg_year_us %>% filter(certificate=="PG-13") , aes(x=startYear)) +
+  geom_line(aes(y=sex,       colour="sex"),size=1) +
+  geom_line(aes(y=drugs,     colour="drugs"),size=1) +
+  geom_line(aes(y=violence,  colour="violence"),size=1) +
+  geom_line(aes(y=profanity, colour="profanity"),size=1) +
+  geom_line(aes(y=intense,   colour="intense"),size=1) +
+  ggtitle("Average Parental Guide Scores for PG-13 rated Titles")+
+  xlab("Year")+ylab("Rating") + 
+  theme(legend.position = "bottom")
+dev.off()
+
+png(paste0(PLOT_DIR,"/us_rating_r.png"),width=800,height=800)
+ggplot(data=pg_year_us %>% filter(certificate=="R") , aes(x=startYear)) +
+  geom_line(aes(y=sex,       colour="sex"),size=1) +
+  geom_line(aes(y=drugs,     colour="drugs"),size=1) +
+  geom_line(aes(y=violence,  colour="violence"),size=1) +
+  geom_line(aes(y=profanity, colour="profanity"),size=1) +
+  geom_line(aes(y=intense,   colour="intense"),size=1) +
+  ggtitle("Average Parental Guide Scores for R rated Titles")+
+  xlab("Year")+ylab("Rating") + 
+  theme(legend.position = "bottom")
+dev.off()
 

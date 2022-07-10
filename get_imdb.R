@@ -36,7 +36,11 @@ get_title("title.episode")
 
 # Episodes
 episode  <- read.delim(paste0(FILE_DIR,"/title.episode.tsv.gz") ,stringsAsFactors = FALSE ,quote="")
-save(episode,file=paste0(DATA_DIR,"/episode.RData"))   # Save Crew Data Frame
+save(episode,file=paste0(DATA_DIR,"/episode.RData"))   # Save Episode Data Frame
+
+episodes <- episode %>% select(parentTconst) %>% group_by(parentTconst) %>% 
+            summarise(episodes = n()) %>% rename(tconst=parentTconst)
+save(episodes,file=paste0(DATA_DIR,"/episodes.RData"))   # Save Episodes Data Frame
 
 basics  <- read.delim(paste0(FILE_DIR,"/title.basics.tsv.gz") ,stringsAsFactors = FALSE ,quote="")
 
