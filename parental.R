@@ -84,6 +84,7 @@ movies <- basics %>%  filter(titleType %in% keeptypes) %>%
   filter(numVotes>1000) %>% arrange(-numVotes)
 
 movie_ids <- movies %>% select(tconst)
+movie_ids_2022 <- movies %>% filter(startYear==2022) %>% select(tconst)
 
 if (file.exists(paste0(DATA_DIR,"/parental.RData"))){
   load(file=paste0(DATA_DIR,"/parental.RData"))
@@ -91,7 +92,8 @@ if (file.exists(paste0(DATA_DIR,"/parental.RData"))){
   parental <- guide_rip(movie_ids$tconst[1])  # Initialise votes data frame
 }
 
-parent_ids <- parental %>% select(tconst)
+parental   <- parental %>% anti_join(movie_ids_2022)  # Update movies in current year.
+parent_ids <- parental   %>% select(tconst)
 
 movie_ids <- movie_ids %>% anti_join(parent_ids)
 

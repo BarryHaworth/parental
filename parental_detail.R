@@ -132,8 +132,8 @@ if (file.exists(paste0(DATA_DIR,"/parental_detail.RData"))){
   parental_detail <- guide_rip(movie_ids$tconst[1])  # Initialise votes data frame
 }
 
-parent_ids <- parental_detail %>% select(tconst)         # List of IDs already extracted
-parent_ids <- parent_ids %>% anti_join(movie_ids_2022)  # Update movies in current year.
+parental_detail <- parental_detail %>% anti_join(movie_ids_2022) # Update movies in current year.
+parent_ids <- parental_detail %>% select(tconst)            # List of IDs already extracted
 
 movie_ids <- movie_ids %>% anti_join(parent_ids)
 

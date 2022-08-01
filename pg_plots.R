@@ -130,7 +130,7 @@ ggplot(data=pg_year_us %>% filter(certificate=="PG") , aes(x=startYear)) +
 dev.off()
 
 png(paste0(PLOT_DIR,"/us_rating_pg-13.png"),width=800,height=800)
-ggplot(data=pg_year_us %>% filter(certificate=="PG-13") , aes(x=startYear)) +
+ggplot(data=pg_year_us %>% filter(certificate=="PG-13", startYear >= 1984) , aes(x=startYear)) +
   geom_line(aes(y=sex,       colour="sex"),size=1) +
   geom_line(aes(y=drugs,     colour="drugs"),size=1) +
   geom_line(aes(y=violence,  colour="violence"),size=1) +

@@ -15,10 +15,17 @@ load(paste0(DATA_DIR,"/country_certificate.RData"))
 names(parental_guide)
 names(country_certificate)
 
-table(country_certificate$country)
-
 # How many Movies? = 49192
 print(paste("Number of distinct presentations =",length(unique(parental_guide$tconst))))
+
+# Filter movies with no parental guides
+parental_guide <- parental_guide %>% filter(sex!=""|violence!=""|profanity!=""|drugs!=""|intense!="")
+
+# How many Movies with Parental Guide? = 35716
+print(paste("Number of presentations with Parental Guide =",length(unique(parental_guide$tconst))))
+
+table(country_certificate$country)
+
 
 cc_table <- data.frame(table(country_certificate$country)) %>% arrange(-Freq)
 names(cc_table) <- c("country","freq")
@@ -47,10 +54,13 @@ for (c_name in head(cc_table$country,10)){
 # United States ratings
 # https://en.wikipedia.org/wiki/Motion_Picture_Association_film_rating_system
 mpaa <- c("G","PG","PG-13","R","X","NC-17")  # MPAA ratings
-cc_us <- country_certificate %>% filter(country=="United States") %>% filter(certificate %in% mpaa)
-pg_us <- parental_guide %>% select(-certificate) %>% inner_join(cc_us,by="tconst")
+cc_us <- country_certificate %>% filter(country=="United States") 
+#cc_us <- cc_us %>% filter(certificate %in% mpaa)
+pg_us <- parental_guide %>% select(-certificate) %>% inner_join(cc_us,by="tconst") 
+#pg_us <- pg_us %>% filter(certificate %in% mpaa)
 save(pg_us,file=paste0(DATA_DIR,"/pg_us.Rdata"))
 
+table(cc_us$certificate)
 table(pg_us$certificate)
 
 # United Kingdom
@@ -61,6 +71,7 @@ pg_uk <- parental_guide %>% select(-certificate) %>% inner_join(cc_uk,by="tconst
 save(pg_uk,file=paste0(DATA_DIR,"/pg_uk.Rdata"))
 
 table(pg_uk$certificate)
+table(cc_uk$certificate)
 
 # Canada
 # https://en.wikipedia.org/wiki/Canadian_motion_picture_rating_system
