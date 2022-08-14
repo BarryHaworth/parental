@@ -116,7 +116,7 @@ guide_rip <- function(tconst){
 #guide_rip("tt0944947")
 
 # Movies to get parental guides
-keeptypes <- c("movie","tvMovie","tvMiniSeries","tvSeries","videoGame")  # List of types to keep
+keeptypes <- c("movie","tvMovie","tvSeries","tvMiniSeries","video","videoGame")  # List of types to keep
 
 movies <- basics %>%  filter(titleType %in% keeptypes) %>%
   left_join(ratings %>% select(tconst,averageRating,numVotes),by="tconst") %>%
@@ -139,7 +139,7 @@ movie_ids <- movie_ids %>% anti_join(parent_ids)
 
 while(nrow(movie_ids)>0){
   # Identify movies to get guide
-  print(paste("Movies to Rip :",nrow((movie_ids))))
+  print(paste("Titles to Rip :",nrow((movie_ids))))
   for (i in 1:min(nrow(movie_ids),100)){
     tryCatch({
       id <- movie_ids$tconst[i]
