@@ -2,6 +2,6 @@
 
 source("get_imdb.R")
 source("parental.R")
-source("parental_guide.R")
+source("parental_detail.R")
 source("certificate.R")
 source("country_ratings.R")
