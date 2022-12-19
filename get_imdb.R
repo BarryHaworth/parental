@@ -51,7 +51,7 @@ basics$endYear   <- as.numeric(basics$endYear)
 basics$runtimeMinutes <- as.numeric(basics$runtimeMinutes)
 
 # Clean Basics
-keeptypes <- c("movie","tvMovie","tvSeries","tvMiniSeries","video","videoGame")  # List of types to keep
+keeptypes <- c("movie","tvMovie","tvSeries","tvMiniSeries","tvSpecial","video","videoGame")  # List of types to keep
 basics    <- basics %>% filter(titleType %in% keeptypes)  # Only keep selected types
 
 # Impute unknown run time with average of type

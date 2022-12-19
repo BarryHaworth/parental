@@ -76,7 +76,7 @@ guide_rip <- function(tconst){
 #guide_rip("tt5742374")
 
 # Movies to get parental guides
-keeptypes <- c("movie","tvMovie","tvSeries","tvMiniSeries","video","videoGame")  # List of types to keep
+keeptypes <- c("movie","tvMovie","tvSeries","tvMiniSeries","tvSpecial","video","videoGame")  # List of types to keep
 
 movies <- basics %>%  filter(titleType %in% keeptypes) %>%
   left_join(ratings %>% select(tconst,averageRating,numVotes),by="tconst") %>%
@@ -84,7 +84,7 @@ movies <- basics %>%  filter(titleType %in% keeptypes) %>%
   filter(numVotes>1000) %>% arrange(-numVotes)
 
 movie_ids <- movies %>% select(tconst)
-movie_ids_2022 <- movies %>% filter(startYear==2022) %>% select(tconst)
+movie_ids_current <- movies %>% filter(startYear==format(Sys.Date(), "%Y")) %>% select(tconst)
 
 if (file.exists(paste0(DATA_DIR,"/parental.RData"))){
   load(file=paste0(DATA_DIR,"/parental.RData"))
@@ -92,7 +92,7 @@ if (file.exists(paste0(DATA_DIR,"/parental.RData"))){
   parental <- guide_rip(movie_ids$tconst[1])  # Initialise votes data frame
 }
 
-parental   <- parental %>% anti_join(movie_ids_2022)  # Update movies in current year.
+parental   <- parental %>% anti_join(movie_ids_current)  # Update movies in current year.
 parent_ids <- parental   %>% select(tconst)
 
 movie_ids <- movie_ids %>% anti_join(parent_ids)

@@ -15,13 +15,13 @@ load(paste0(DATA_DIR,"/country_certificate.RData"))
 names(parental_guide)
 names(country_certificate)
 
-# How many Movies? = 49192
+# How many Movies? = 51499
 print(paste("Number of distinct presentations =",length(unique(parental_guide$tconst))))
 
 # Filter movies with no parental guides
 parental_guide <- parental_guide %>% filter(sex!=""|violence!=""|profanity!=""|drugs!=""|intense!="")
 
-# How many Movies with Parental Guide? = 35716
+# How many Movies with Parental Guide? = 37217
 print(paste("Number of presentations with Parental Guide =",length(unique(parental_guide$tconst))))
 
 table(country_certificate$country)
@@ -57,6 +57,7 @@ mpaa <- c("G","PG","PG-13","R","X","NC-17")  # MPAA ratings
 cc_us <- country_certificate %>% filter(country=="United States") 
 #cc_us <- cc_us %>% filter(certificate %in% mpaa)
 pg_us <- parental_guide %>% select(-certificate) %>% inner_join(cc_us,by="tconst") 
+# Many movies have more than one certificate.  Do any not have an MPAA certificate?  How do they line up?
 #pg_us <- pg_us %>% filter(certificate %in% mpaa)
 save(pg_us,file=paste0(DATA_DIR,"/pg_us.Rdata"))
 
