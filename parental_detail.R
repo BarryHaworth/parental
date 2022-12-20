@@ -136,7 +136,7 @@ delta_vote <- ratings %>% inner_join(parental_detail %>% select(tconst,numVotes)
   mutate(delta=numVotes_new-numVotes_old,
          delta_pct=delta/numVotes_old)
 
-delta_ids <- delta_vote %>%filter(delta>100|delta_pct>0.1) %>% select(tconst)
+delta_ids <- delta_vote %>%filter(delta>200|delta_pct>0.02) %>% select(tconst)
 
 movie_ids <- movie_ids %>% anti_join(parent_ids)      # Remove IDs already extracted
 movie_ids <- rbind(movie_ids,delta_ids) %>% unique()  # Keep the ids that have changed
