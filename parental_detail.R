@@ -5,6 +5,7 @@
 # 27/06/2022  Changed delimiter character with certificate from comma to | 
 #
 # 04/07/2022  Try to capture the number of votes for each parental guide
+# 20/12/2022  Updated to include numVotes in data sets
 
 library(rvest)
 library(dplyr)
@@ -24,8 +25,9 @@ load(paste0(DATA_DIR,"/basics.RData"))
 load(paste0(DATA_DIR,"/ratings.RData"))
 
 # Read Parental Guidance details for a single movie
-guide_rip <- function(tconst){
+detail_rip <- function(tconst){
   url <- paste0('https://www.imdb.com/title/',tconst,'/parentalguide')
+  t <- tconst
   #Reading the HTML code from the website
   webpage <- read_html(url)
   mpaa_html  <- html_nodes(webpage,'td')
@@ -56,6 +58,7 @@ guide_rip <- function(tconst){
     if (drugs==""){i=i+1}  else {i=i+2}
     intense <- html_text(guide_html[i])
   }
+  numVotes = ratings %>% filter(tconst==t) %>% select(numVotes)
   
   detail_html <- html_nodes(webpage,'.advisory-severity-vote__vote-button-container')
   sex_details  <- strsplit(html_text(detail_html[[1]]),"\n")[[1]]
@@ -89,7 +92,7 @@ guide_rip <- function(tconst){
   intense_severe   <- as.numeric(gsub(",","",intense_details[16]))
   intense_total    <- intense_none+intense_mild+intense_moderate+intense_severe
   
-  guide     <- data.frame(tconst,
+  guide     <- data.frame(tconst,numVotes,
                           sex, sex_none, sex_mild, sex_moderate,sex_severe, sex_total,
                           violence,violence_none, violence_mild, violence_moderate,violence_severe, violence_total,
                           profanity,profanity_none, profanity_mild, profanity_moderate,profanity_severe, profanity_total,
@@ -100,20 +103,13 @@ guide_rip <- function(tconst){
 }
 
 # Test movies
-#guide_rip("tt0452694")
-#guide_rip("tt8783930")
+#detail_rip("tt0111161")
+#detail_rip("tt0452694")
 # Some problem movies:
-#  
-# guide_rip("tt0385267") 
-# guide_rip("tt0183869")
-# guide_rip("tt0245803")
-# guide_rip("tt0417217")
-#guide_rip("tt1772925") # no ratings
-#guide_rip("tt2574698") # some, not all ratings
-#guide_rip("tt1179782") # table is empty
-#guide_rip("tt0216707")
-#guide_rip("tt2404435")
-#guide_rip("tt0944947")
+# detail_rip("tt0385267") 
+#detail_rip("tt1772925") # no ratings
+#detail_rip("tt2574698") # some, not all ratings
+#detail_rip("tt1179782") # table is empty
 
 # Movies to get parental guides
 keeptypes <- c("movie","tvMovie","tvSeries","tvMiniSeries","tvSpecial","video","videoGame")  # List of types to keep
@@ -129,13 +125,21 @@ movie_ids_current <- movies %>% filter(startYear==format(Sys.Date(), "%Y")) %>% 
 if (file.exists(paste0(DATA_DIR,"/parental_detail.RData"))){
   load(file=paste0(DATA_DIR,"/parental_detail.RData"))
 } else {
-  parental_detail <- guide_rip(movie_ids$tconst[1])  # Initialise votes data frame
+  parental_detail <- detail_rip(movie_ids$tconst[1])  # Initialise votes data frame
 }
 
-parental_detail <- parental_detail %>% anti_join(movie_ids_current) # Update movies in current year.
+#parental_detail <- parental_detail %>% anti_join(movie_ids_current) # Update movies in current year.
 parent_ids <- parental_detail %>% select(tconst)            # List of IDs already extracted
 
-movie_ids <- movie_ids %>% anti_join(parent_ids)
+# Check for updated votes
+delta_vote <- ratings %>% inner_join(parental_detail %>% select(tconst,numVotes),by="tconst", suffix=c("_new","_old")) %>%
+  mutate(delta=numVotes_new-numVotes_old,
+         delta_pct=delta/numVotes_old)
+
+delta_ids <- delta_vote %>%filter(delta>100|delta_pct>0.1) %>% select(tconst)
+
+movie_ids <- movie_ids %>% anti_join(parent_ids)      # Remove IDs already extracted
+movie_ids <- rbind(movie_ids,delta_ids) %>% unique()  # Keep the ids that have changed
 
 while(nrow(movie_ids)>0){
   # Identify movies to get guide
@@ -146,7 +150,7 @@ while(nrow(movie_ids)>0){
       movieTitle <- as.character(movies %>% filter(tconst==id) %>% select(primaryTitle))
       numVotes <- as.numeric(movies %>% filter(tconst==id) %>% select(numVotes))
       print(paste(i,"Movie",id,"votes",numVotes,movieTitle))
-      parental_detail <- bind_rows(parental_detail,guide_rip(id))
+      parental_detail <- bind_rows(parental_detail,detail_rip(id))
     }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
   }
   print("Saving Movie Votes Data Frame")
@@ -156,7 +160,8 @@ while(nrow(movie_ids)>0){
   movie_ids <- movie_ids %>% anti_join(parent_ids)
 }
 
-parental_detail_guide <- movies %>% inner_join(parental_detail,by="tconst") %>%
+parental_detail_guide <- movies %>% select(-numVotes) %>% 
+  inner_join(parental_detail,by="tconst") %>%
   mutate(sex_code = case_when(sex=="None"~1,
                               sex=="Mild"~2,
                               sex=="Moderate"~3,

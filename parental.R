@@ -3,6 +3,7 @@
 # 24/06/2022  Updated to return blank values if not included.
 # 26/06/2022  Moved from IMDB project to separate parental guidance project
 # 27/06/2022  Changed delimiter character with certificate from comma to | 
+# 20/12/2022  Updated to include numVotes in data sets
 
 library(rvest)
 library(dplyr)
@@ -24,6 +25,7 @@ load(paste0(DATA_DIR,"/ratings.RData"))
 # Read Parental Guidance details for a single movie
 guide_rip <- function(tconst){
   url <- paste0('https://www.imdb.com/title/',tconst,'/parentalguide')
+  t <- tconst
   #Reading the HTML code from the website
   webpage <- read_html(url)
   mpaa_html  <- html_nodes(webpage,'td')
@@ -54,26 +56,20 @@ guide_rip <- function(tconst){
     if (drugs==""){i=i+1}  else {i=i+2}
     intense <- html_text(guide_html[i])
   }
-  guide     <- data.frame(tconst,sex,violence,profanity,drugs,intense,
+  numVotes = ratings %>% filter(tconst==t) %>% select(numVotes)
+  guide     <- data.frame(tconst,numVotes,sex,violence,profanity,drugs,intense,
                           mpaa,certificate,stringsAsFactors=FALSE)
   return(guide)
 }
 
 # Test movies
+#guide_rip("tt0111161")
 #guide_rip("tt0452694")
-#guide_rip("tt8783930")
 # Some problem movies:
 # guide_rip("tt7668842") 
-# guide_rip("tt0385267") 
-# guide_rip("tt0183869")
-# guide_rip("tt0245803")
-# guide_rip("tt0417217")
 #guide_rip("tt1772925") # no ratings
 #guide_rip("tt2574698") # some, not all ratings
 #guide_rip("tt1179782") # table is empty
-#guide_rip("tt0216707")
-#guide_rip("tt2404435")
-#guide_rip("tt5742374")
 
 # Movies to get parental guides
 keeptypes <- c("movie","tvMovie","tvSeries","tvMiniSeries","tvSpecial","video","videoGame")  # List of types to keep
@@ -92,10 +88,18 @@ if (file.exists(paste0(DATA_DIR,"/parental.RData"))){
   parental <- guide_rip(movie_ids$tconst[1])  # Initialise votes data frame
 }
 
-parental   <- parental %>% anti_join(movie_ids_current)  # Update movies in current year.
+# parental   <- parental %>% anti_join(movie_ids_current)  # Update movies in current year.
 parent_ids <- parental   %>% select(tconst)
 
-movie_ids <- movie_ids %>% anti_join(parent_ids)
+# Check for updated votes
+delta_vote <- ratings %>% inner_join(parental %>% select(tconst,numVotes),by="tconst", suffix=c("_new","_old")) %>%
+  mutate(delta=numVotes_new-numVotes_old,
+         delta_pct=delta/numVotes_old)
+
+delta_ids <- delta_vote %>%filter(delta>100|delta_pct>0.1) %>% select(tconst)
+
+movie_ids <- movie_ids %>% anti_join(parent_ids)      # Remove IDs already extracted
+movie_ids <- rbind(movie_ids,delta_ids) %>% unique()  # Keep the ids that have changed
 
 while(nrow(movie_ids)>0){
   # Identify movies to get guide
@@ -116,7 +120,8 @@ while(nrow(movie_ids)>0){
   movie_ids <- movie_ids %>% anti_join(parent_ids)
 }
 
-parental_guide <- movies %>% inner_join(parental,by="tconst") %>%
+parental_guide <- movies %>% select(-numVotes) %>% 
+  inner_join(parental,by="tconst") %>%
   mutate(sex_code = case_when(sex=="None"~1,
                               sex=="Mild"~2,
                               sex=="Moderate"~3,
@@ -147,6 +152,8 @@ parental_guide <- parental_guide[c("tconst","titleType","primaryTitle","original
 
 save(parental_guide,file=paste0(DATA_DIR,"/parental_guide.Rdata"))
 write.csv(parental_guide,paste0(DATA_DIR,"/IMDB_parental_guide.csv"),row.names = FALSE)
+
+table(parental_guide$titleType)
 
 table(parental$sex)
 table(parental$violence)
