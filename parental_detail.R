@@ -128,18 +128,18 @@ if (file.exists(paste0(DATA_DIR,"/parental_detail.RData"))){
   parental_detail <- detail_rip(movie_ids$tconst[1])  # Initialise votes data frame
 }
 
-#parental_detail <- parental_detail %>% anti_join(movie_ids_current) # Update movies in current year.
-parent_ids <- parental_detail %>% select(tconst)            # List of IDs already extracted
-
 # Check for updated votes
 delta_vote <- ratings %>% inner_join(parental_detail %>% select(tconst,numVotes),by="tconst", suffix=c("_new","_old")) %>%
   mutate(delta=numVotes_new-numVotes_old,
          delta_pct=delta/numVotes_old)
 
-delta_ids <- delta_vote %>%filter(delta>200|delta_pct>0.02) %>% select(tconst)
+delta_ids <- delta_vote %>%filter(delta>200|delta_pct>0.02) %>% arrange(-numVotes_new) %>% select(tconst)
+
+#parental_detail <- parental_detail %>% anti_join(movie_ids_current) # Update movies in current year.
+parental_detail  <- parental_detail %>% anti_join(delta_ids)      # Update movies which have changed.
+parent_ids       <- parental_detail %>% select(tconst)            # List of IDs already extracted
 
 movie_ids <- movie_ids %>% anti_join(parent_ids)      # Remove IDs already extracted
-movie_ids <- rbind(movie_ids,delta_ids) %>% unique()  # Keep the ids that have changed
 
 while(nrow(movie_ids)>0){
   # Identify movies to get guide
