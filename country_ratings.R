@@ -15,17 +15,19 @@ load(paste0(DATA_DIR,"/country_certificate.RData"))
 names(parental_guide)
 names(country_certificate)
 
-# How many Movies? = 51499
+# How many Movies? = 52988
 print(paste("Number of distinct presentations =",length(unique(parental_guide$tconst))))
 
 # Filter movies with no parental guides
 parental_guide <- parental_guide %>% filter(sex!=""|violence!=""|profanity!=""|drugs!=""|intense!="")
+parental_guide_any <- parental_guide %>% filter(sex!=""|violence!=""|profanity!=""|drugs!=""|intense!="")
+parental_guide_all <- parental_guide %>% filter(sex!=""&violence!=""&profanity!=""&drugs!=""&intense!="")
 
-# How many Movies with Parental Guide? = 37217
-print(paste("Number of presentations with Parental Guide =",length(unique(parental_guide$tconst))))
+# How many Movies with Parental Guide? = 38463
+print(paste("Number of presentations with at least one Parental Guide =",length(unique(parental_guide_any$tconst))))
+print(paste("Number of presentations with all Parental Guides =",length(unique(parental_guide_all$tconst))))
 
 table(country_certificate$country)
-
 
 cc_table <- data.frame(table(country_certificate$country)) %>% arrange(-Freq)
 names(cc_table) <- c("country","freq")
@@ -56,19 +58,23 @@ for (c_name in head(cc_table$country,10)){
 mpaa <- c("G","PG","PG-13","R","X","NC-17")  # MPAA ratings
 cc_us <- country_certificate %>% filter(country=="United States") 
 #cc_us <- cc_us %>% filter(certificate %in% mpaa)
-pg_us <- parental_guide %>% select(-certificate) %>% inner_join(cc_us,by="tconst") 
-# Many movies have more than one certificate.  Do any not have an MPAA certificate?  How do they line up?
-#pg_us <- pg_us %>% filter(certificate %in% mpaa)
+pg_us <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_us,by="tconst") 
 save(pg_us,file=paste0(DATA_DIR,"/pg_us.Rdata"))
 
 table(cc_us$certificate)
 table(pg_us$certificate)
 
+# Many movies have more than one certificate.  Do any not have an MPAA certificate?  How do they line up?
+pg_us_mpaa <- pg_us %>% filter(certificate %in% mpaa)
+cc_us_mpaa <- cc_us %>% filter(certificate %in% mpaa)
+cc_us_mpaa_id <- cc_us_mpaa %>% select(tconst) %>% unique()
+cc_us_not_mpaa <- cc_us %>% anti_join(cc_us_mpaa_id,by="tconst")
+
 # United Kingdom
 # https://en.wikipedia.org/wiki/British_Board_of_Film_Classification
 bbfc <- c("U","PG","12A","12","15","18","R18")
 cc_uk <- country_certificate %>% filter(country=="United Kingdom") %>% filter(certificate %in% bbfc)
-pg_uk <- parental_guide %>% select(-certificate) %>% inner_join(cc_uk,by="tconst")
+pg_uk <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_uk,by="tconst")
 save(pg_uk,file=paste0(DATA_DIR,"/pg_uk.Rdata"))
 
 table(pg_uk$certificate)
@@ -78,7 +84,7 @@ table(cc_uk$certificate)
 # https://en.wikipedia.org/wiki/Canadian_motion_picture_rating_system
 cmprs <- c("G","PG","14A","18A","R","A","13+","16+","18+")
 cc_can <- country_certificate %>% filter(country=="Canada") %>% filter(certificate %in% cmprs)
-pg_can <- parental_guide %>% select(-certificate) %>% inner_join(cc_can,by="tconst")
+pg_can <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_can,by="tconst")
 save(pg_can,file=paste0(DATA_DIR,"/pg_can.Rdata"))
 
 table(pg_can$certificate)
@@ -88,7 +94,7 @@ table(pg_can$certificate)
 # https://en.wikipedia.org/wiki/Australian_Classification_Board
 acb <- c("G","PG","M","MA","MA15+","R","R18+")
 cc_aus <- country_certificate %>% filter(country=="Australia") %>% filter(certificate %in% acb)
-pg_aus <- parental_guide %>% select(-certificate) %>% inner_join(cc_aus,by="tconst")
+pg_aus <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_aus,by="tconst")
 save(pg_aus,file=paste0(DATA_DIR,"/pg_aus.Rdata"))
 
 table(pg_aus$certificate)
@@ -98,7 +104,7 @@ table(pg_aus$certificate)
 # https://www.dw.com/en/how-germanys-film-age-rating-system-works/a-41551312
 fsk <- c("0","6","12","16","18")
 cc_deu <- country_certificate %>% filter(country=="Germany") %>% filter(certificate %in% fsk)
-pg_deu <- parental_guide %>% select(-certificate) %>% inner_join(cc_deu,by="tconst")
+pg_deu <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_deu,by="tconst")
 save(pg_deu,file=paste0(DATA_DIR,"/pg_deu.Rdata"))
 
 table(pg_deu$certificate)

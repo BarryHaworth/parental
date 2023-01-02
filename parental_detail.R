@@ -133,7 +133,7 @@ delta_vote <- ratings %>% inner_join(parental_detail %>% select(tconst,numVotes)
   mutate(delta=numVotes_new-numVotes_old,
          delta_pct=delta/numVotes_old)
 
-delta_ids <- delta_vote %>%filter(delta>200|delta_pct>0.02) %>% arrange(-numVotes_new) %>% select(tconst)
+delta_ids <- delta_vote %>%filter(delta>1000|delta_pct>0.05) %>% arrange(-numVotes_new) %>% select(tconst)
 
 #parental_detail <- parental_detail %>% anti_join(movie_ids_current) # Update movies in current year.
 parental_detail  <- parental_detail %>% anti_join(delta_ids)      # Update movies which have changed.

@@ -69,7 +69,7 @@ guide_rip <- function(tconst){
 # guide_rip("tt7668842") 
 #guide_rip("tt1772925") # no ratings
 #guide_rip("tt2574698") # some, not all ratings
-#guide_rip("tt1179782") # table is empty
+#guide_rip("tt2433614") # table is empty
 
 # Movies to get parental guides
 keeptypes <- c("movie","tvMovie","tvSeries","tvMiniSeries","tvSpecial","video","videoGame")  # List of types to keep
@@ -93,7 +93,7 @@ delta_vote <- ratings %>% inner_join(parental %>% select(tconst,numVotes),by="tc
   mutate(delta=numVotes_new-numVotes_old,
          delta_pct=delta/numVotes_old)
 
-delta_ids <- delta_vote %>%filter(delta>200|delta_pct>0.02) %>% arrange(-numVotes_new) %>% select(tconst)
+delta_ids <- delta_vote %>%filter(delta>1000|delta_pct>0.05) %>% arrange(-numVotes_new) %>% select(tconst)
 
 # parental   <- parental %>% anti_join(movie_ids_current)  # Update movies in current year.
 parental     <- parental %>% anti_join(delta_ids)  # Update movies which have changed.

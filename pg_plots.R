@@ -33,10 +33,14 @@ load(paste0(DATA_DIR,"/pg_can.RData"))
 load(paste0(DATA_DIR,"/pg_aus.RData"))
 load(paste0(DATA_DIR,"/pg_deu.RData"))
 
-# Filter the Titles.  Year range 1980 - 2019.  This is the year range used by u/joker_penguin (Pablo)
-
-parental_guide <- parental_guide %>% filter(startYear>=1980 & startYear<=2019)
 table(parental_guide$startYear)
+hist(parental_guide$startYear)
+
+# Filter the Titles.  Year range 1980 - 2019.  This is the year range used by u/joker_penguin (Pablo)
+# parental_guide <- parental_guide %>% filter(startYear>=1980 & startYear<=2020)  # keep 2020 data
+parental_guide <- parental_guide %>% filter(startYear>=1980)  # keep 1980 onwards
+table(parental_guide$startYear)
+hist(parental_guide$startYear)
 
 names(parental_guide)
 names(country_certificate)
