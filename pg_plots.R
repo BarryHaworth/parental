@@ -34,11 +34,11 @@ load(paste0(DATA_DIR,"/pg_aus.RData"))
 load(paste0(DATA_DIR,"/pg_deu.RData"))
 
 table(parental_guide$startYear)
+par(mar=c(2,2,2,2))
 hist(parental_guide$startYear)
 
-# Filter the Titles.  Year range 1980 - 2019.  This is the year range used by u/joker_penguin (Pablo)
-# parental_guide <- parental_guide %>% filter(startYear>=1980 & startYear<=2020)  # keep 2020 data
-parental_guide <- parental_guide %>% filter(startYear>=1980)  # keep 1980 onwards
+# Filter the Titles.  Year range 1980 - 2019 is the year range used by u/joker_penguin (Pablo)
+parental_guide <- parental_guide %>% filter(startYear>=1980 & startYear<=2022)  # keep 2020 data
 table(parental_guide$startYear)
 hist(parental_guide$startYear)
 
@@ -49,11 +49,11 @@ guides <- c("sex","violence","profanity","drugs","intense")  # List of Parental 
 codes  <- c("sex_code","violence_code","profanity_code","drug_code","intense_code")  # List of Parental Guide variables
 
 # Set guides as ordered factors
-parental_guide$sex       <- factor(parental_guide$sex,levels=c("None","Mild","Moderate","Severe"))
-parental_guide$violence  <- factor(parental_guide$violence,levels=c("None","Mild","Moderate","Severe"))
+parental_guide$sex       <- factor(parental_guide$sex,      levels=c("None","Mild","Moderate","Severe"))
+parental_guide$violence  <- factor(parental_guide$violence, levels=c("None","Mild","Moderate","Severe"))
 parental_guide$profanity <- factor(parental_guide$profanity,levels=c("None","Mild","Moderate","Severe"))
-parental_guide$drugs     <- factor(parental_guide$drugs,levels=c("None","Mild","Moderate","Severe"))
-parental_guide$intense   <- factor(parental_guide$intense,levels=c("None","Mild","Moderate","Severe"))
+parental_guide$drugs     <- factor(parental_guide$drugs,    levels=c("None","Mild","Moderate","Severe"))
+parental_guide$intense   <- factor(parental_guide$intense,  levels=c("None","Mild","Moderate","Severe"))
 
 summary(parental_guide[guides])
 summary(parental_guide[codes])
@@ -62,13 +62,13 @@ summary(parental_guide[codes])
 png(paste0(PLOT_DIR,"/total_titles.png"),width=800,height=800)
 ggplot(data=parental_guide) +
   geom_histogram((aes(x=startYear)),  fill="cornflowerblue" ,binwidth = 1) +
-  ggtitle("Total Titles by Year 1980 - 2019")
+  ggtitle("Total Titles by Year 1980 - 2022")
 dev.off()
 
 png(paste0(PLOT_DIR,"/total_types.png"),width=800,height=800)
 ggplot(data=parental_guide, aes(x=startYear,fill=titleType)) +
   geom_bar() +
-  ggtitle("Titles by Type by Year 1980 - 2019")
+  ggtitle("Titles by Type by Year 1980 - 2022")
 dev.off()
 
 # Parental Guide scores by Year
@@ -89,7 +89,9 @@ ggplot(data=pg_year, aes(x=startYear)) +
   geom_line(aes(y=violence,  colour="violence"),size=1) +
   geom_line(aes(y=profanity, colour="profanity"),size=1) +
   geom_line(aes(y=intense,   colour="intense"),size=1) +
-  ggtitle("Average Parental Guide Scores for all Titles")
+  ggtitle("Average Parental Guide Scores for all Titles") +
+  scale_y_continuous(limits=c(1,4),breaks=c(1,2,3,4),labels=c("None","Mild","Moderate","Severe"))+
+  xlab("Year")+ylab("Rating") 
 dev.off()
 
 # Separate plots for different US Rating groups.
@@ -118,6 +120,7 @@ ggplot(data=pg_year_us %>% filter(certificate=="G") , aes(x=startYear)) +
   geom_line(aes(y=intense,   colour="intense"),size=1) +
   ggtitle("Average Parental Guide Scores for G rated Titles") +
   xlab("Year")+ylab("Rating") +
+  scale_y_continuous(limits=c(1,4),breaks=c(1,2,3,4),labels=c("None","Mild","Moderate","Severe"))+
   theme(legend.position = "bottom")
 dev.off()
 
@@ -130,6 +133,7 @@ ggplot(data=pg_year_us %>% filter(certificate=="PG") , aes(x=startYear)) +
   geom_line(aes(y=intense,   colour="intense"),size=1) +
   ggtitle("Average Parental Guide Scores for PG rated Titles")+
   xlab("Year")+ylab("Rating") +
+  scale_y_continuous(limits=c(1,4),breaks=c(1,2,3,4),labels=c("None","Mild","Moderate","Severe"))+
   theme(legend.position = "bottom")
 dev.off()
 
@@ -142,6 +146,7 @@ ggplot(data=pg_year_us %>% filter(certificate=="PG-13", startYear >= 1984) , aes
   geom_line(aes(y=intense,   colour="intense"),size=1) +
   ggtitle("Average Parental Guide Scores for PG-13 rated Titles")+
   xlab("Year")+ylab("Rating") + 
+  scale_y_continuous(limits=c(1,4),breaks=c(1,2,3,4),labels=c("None","Mild","Moderate","Severe"))+
   theme(legend.position = "bottom")
 dev.off()
 
@@ -154,6 +159,7 @@ ggplot(data=pg_year_us %>% filter(certificate=="R") , aes(x=startYear)) +
   geom_line(aes(y=intense,   colour="intense"),size=1) +
   ggtitle("Average Parental Guide Scores for R rated Titles")+
   xlab("Year")+ylab("Rating") + 
+  scale_y_continuous(limits=c(1,4),breaks=c(1,2,3,4),labels=c("None","Mild","Moderate","Severe"))+
   theme(legend.position = "bottom")
 dev.off()
 

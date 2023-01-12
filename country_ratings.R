@@ -1,5 +1,9 @@
 # read the certificate data and determine the major rating for each movie
 # by selected countries
+#
+# 12/01/2023  Some cleaning of the output.  
+# Removed duplicates caused by multiple certificates for some movies which had a
+# regular and a directors cut certificate
 
 library(dplyr)
 library(ggplot2)
@@ -15,15 +19,14 @@ load(paste0(DATA_DIR,"/country_certificate.RData"))
 names(parental_guide)
 names(country_certificate)
 
-# How many Movies? = 52988
+# How many Movies? = 53194  (12/01/2023)
 print(paste("Number of distinct presentations =",length(unique(parental_guide$tconst))))
 
 # Filter movies with no parental guides
-parental_guide <- parental_guide %>% filter(sex!=""|violence!=""|profanity!=""|drugs!=""|intense!="")
 parental_guide_any <- parental_guide %>% filter(sex!=""|violence!=""|profanity!=""|drugs!=""|intense!="")
 parental_guide_all <- parental_guide %>% filter(sex!=""&violence!=""&profanity!=""&drugs!=""&intense!="")
 
-# How many Movies with Parental Guide? = 38463
+# How many Movies with Parental Guide? Any = 38563, All = 30217
 print(paste("Number of presentations with at least one Parental Guide =",length(unique(parental_guide_any$tconst))))
 print(paste("Number of presentations with all Parental Guides =",length(unique(parental_guide_all$tconst))))
 
@@ -56,24 +59,17 @@ for (c_name in head(cc_table$country,10)){
 # United States ratings
 # https://en.wikipedia.org/wiki/Motion_Picture_Association_film_rating_system
 mpaa <- c("G","PG","PG-13","R","X","NC-17")  # MPAA ratings
-cc_us <- country_certificate %>% filter(country=="United States") 
-#cc_us <- cc_us %>% filter(certificate %in% mpaa)
-pg_us <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_us,by="tconst") 
+cc_us <- country_certificate %>% filter(country=="United States") %>% filter(certificate %in% mpaa) %>% select(-certificates) %>% unique()
+pg_us <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_us,by="tconst")  
 save(pg_us,file=paste0(DATA_DIR,"/pg_us.Rdata"))
 
 table(cc_us$certificate)
 table(pg_us$certificate)
 
-# Many movies have more than one certificate.  Do any not have an MPAA certificate?  How do they line up?
-pg_us_mpaa <- pg_us %>% filter(certificate %in% mpaa)
-cc_us_mpaa <- cc_us %>% filter(certificate %in% mpaa)
-cc_us_mpaa_id <- cc_us_mpaa %>% select(tconst) %>% unique()
-cc_us_not_mpaa <- cc_us %>% anti_join(cc_us_mpaa_id,by="tconst")
-
 # United Kingdom
 # https://en.wikipedia.org/wiki/British_Board_of_Film_Classification
 bbfc <- c("U","PG","12A","12","15","18","R18")
-cc_uk <- country_certificate %>% filter(country=="United Kingdom") %>% filter(certificate %in% bbfc)
+cc_uk <- country_certificate %>% filter(country=="United Kingdom") %>% filter(certificate %in% bbfc) %>% select(-certificates) %>% unique()
 pg_uk <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_uk,by="tconst")
 save(pg_uk,file=paste0(DATA_DIR,"/pg_uk.Rdata"))
 
@@ -83,7 +79,7 @@ table(cc_uk$certificate)
 # Canada
 # https://en.wikipedia.org/wiki/Canadian_motion_picture_rating_system
 cmprs <- c("G","PG","14A","18A","R","A","13+","16+","18+")
-cc_can <- country_certificate %>% filter(country=="Canada") %>% filter(certificate %in% cmprs)
+cc_can <- country_certificate %>% filter(country=="Canada") %>% filter(certificate %in% cmprs) %>% select(-certificates) %>% unique()
 pg_can <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_can,by="tconst")
 save(pg_can,file=paste0(DATA_DIR,"/pg_can.Rdata"))
 
@@ -93,7 +89,7 @@ table(pg_can$certificate)
 # Australia
 # https://en.wikipedia.org/wiki/Australian_Classification_Board
 acb <- c("G","PG","M","MA","MA15+","R","R18+")
-cc_aus <- country_certificate %>% filter(country=="Australia") %>% filter(certificate %in% acb)
+cc_aus <- country_certificate %>% filter(country=="Australia") %>% filter(certificate %in% acb) %>% select(-certificates) %>% unique()
 pg_aus <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_aus,by="tconst")
 save(pg_aus,file=paste0(DATA_DIR,"/pg_aus.Rdata"))
 
@@ -103,9 +99,8 @@ table(pg_aus$certificate)
 # Germany (DEU)
 # https://www.dw.com/en/how-germanys-film-age-rating-system-works/a-41551312
 fsk <- c("0","6","12","16","18")
-cc_deu <- country_certificate %>% filter(country=="Germany") %>% filter(certificate %in% fsk)
+cc_deu <- country_certificate %>% filter(country=="Germany") %>% filter(certificate %in% fsk) %>% select(-certificates) %>% unique()
 pg_deu <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_deu,by="tconst")
 save(pg_deu,file=paste0(DATA_DIR,"/pg_deu.Rdata"))
 
 table(pg_deu$certificate)
-
