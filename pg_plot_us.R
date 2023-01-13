@@ -8,14 +8,14 @@ library(ggplot2)
 library(forcats)
 library(reshape2)
 
-PROJECT_DIR <- "c:/R/parental"
-DATA_DIR    <- paste0(PROJECT_DIR,"/data")
-PLOT_DIR    <- paste0(PROJECT_DIR,"/plot")
+PROJECT_DIR <- "c:/R/parental/"
+DATA_DIR    <- paste0(PROJECT_DIR,"data/")
+PLOT_DIR    <- paste0(PROJECT_DIR,"plot/")
 
-#load(paste0(DATA_DIR,"/parental_guide.RData"))
-#load(paste0(DATA_DIR,"/country_certificate.RData"))
+#load(paste0(DATA_DIR,"parental_guide.RData"))
+#load(paste0(DATA_DIR,"country_certificate.RData"))
 # Load Country guides
-load(paste0(DATA_DIR,"/pg_us.RData"))
+load(paste0(DATA_DIR,"pg_us.RData"))
 
 table(pg_us$startYear)
 par(mar=c(2,2,2,2))
@@ -58,7 +58,7 @@ pg_melt <- melt(pg_us_filt %>% select(tconst,titleType,primaryTitle,startYear,ce
 pg_melt$level <- factor(pg_melt$level,levels=c("None","Mild","Moderate","Severe"))
 pg_melt$rating <- as.numeric(pg_melt$level)
 
-png(paste0(PLOT_DIR,"/pg_us_all.png"),width=800,height=800)
+png(paste0(PLOT_DIR,"pg_us_all.png"),width=800,height=800)
 ggplot(pg_melt, aes(x=startYear, y=rating, color=guide)) + 
   stat_summary(fun=mean, geom="line", size=1)+
   ggtitle("Parental Guides by Year and Guide") +
@@ -69,8 +69,12 @@ ggplot(pg_melt, aes(x=startYear, y=rating, color=guide)) +
 dev.off()
 
 # Redo these as a loop?
+for (guide in guides){
+  
+}
 
-png(paste0(PLOT_DIR,"/pg_us_sex.png"),width=800,height=800)
+
+png(paste0(PLOT_DIR,"pg_us_sex.png"),width=800,height=800)
 ggplot(pg_melt %>% filter(guide=="sex"), aes(x=startYear, y=rating, color=certificate)) + 
   stat_summary(fun=mean, geom="line", size=1)+
   ggtitle("Sex Rating by Year and Certificate") +
@@ -80,7 +84,7 @@ ggplot(pg_melt %>% filter(guide=="sex"), aes(x=startYear, y=rating, color=certif
   theme(legend.position = "bottom")
 dev.off()
 
-png(paste0(PLOT_DIR,"/pg_us_violence.png"),width=800,height=800)
+png(paste0(PLOT_DIR,"pg_us_violence.png"),width=800,height=800)
 ggplot(pg_melt %>% filter(guide=="violence"), aes(x=startYear, y=rating, color=certificate)) + 
   stat_summary(fun=mean, geom="line", size=1)+
   ggtitle("Violence Rating by Year and Certificate") +
@@ -90,7 +94,7 @@ ggplot(pg_melt %>% filter(guide=="violence"), aes(x=startYear, y=rating, color=c
   theme(legend.position = "bottom")
 dev.off()
 
-png(paste0(PLOT_DIR,"/pg_us_profanity.png"),width=800,height=800)
+png(paste0(PLOT_DIR,"pg_us_profanity.png"),width=800,height=800)
 ggplot(pg_melt %>% filter(guide=="profanity"), aes(x=startYear, y=rating, color=certificate)) + 
   stat_summary(fun=mean, geom="line", size=1)+
   ggtitle("Profanity Rating by Year and Certificate") +
@@ -100,7 +104,7 @@ ggplot(pg_melt %>% filter(guide=="profanity"), aes(x=startYear, y=rating, color=
   theme(legend.position = "bottom")
 dev.off()
 
-png(paste0(PLOT_DIR,"/pg_us_drugs.png"),width=800,height=800)
+png(paste0(PLOT_DIR,"pg_us_drugs.png"),width=800,height=800)
 ggplot(pg_melt %>% filter(guide=="drugs"), aes(x=startYear, y=rating, color=certificate)) + 
   stat_summary(fun=mean, geom="line", size=1)+
   ggtitle("Drugs & Alcohol Rating by Year and Certificate") +
@@ -110,7 +114,7 @@ ggplot(pg_melt %>% filter(guide=="drugs"), aes(x=startYear, y=rating, color=cert
   theme(legend.position = "bottom")
 dev.off()
 
-png(paste0(PLOT_DIR,"/pg_us_intense.png"),width=800,height=800)
+png(paste0(PLOT_DIR,"pg_us_intense.png"),width=800,height=800)
 ggplot(pg_melt %>% filter(guide=="intense"), aes(x=startYear, y=rating, color=certificate)) + 
   stat_summary(fun=mean, geom="line", size=1)+
   ggtitle("Frightening & Intense Rating by Year and Certificate") +

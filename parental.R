@@ -15,12 +15,12 @@ options(timeout= 4000000)
 print("Program started")
 timestamp()
 
-PROJECT_DIR <- "c:/R/parental"
-DATA_DIR    <- paste0(PROJECT_DIR,"/data")
-FILE_DIR    <- paste0(DATA_DIR,"/tsv")
+PROJECT_DIR <- "c:/R/parental/"
+DATA_DIR    <- paste0(PROJECT_DIR,"data/")
+FILE_DIR    <- paste0(DATA_DIR,"tsv/")
 
-load(paste0(DATA_DIR,"/basics.RData"))
-load(paste0(DATA_DIR,"/ratings.RData"))
+load(paste0(DATA_DIR,"basics.RData"))
+load(paste0(DATA_DIR,"ratings.RData"))
 
 # Read Parental Guidance details for a single movie
 guide_rip <- function(tconst){
@@ -82,8 +82,8 @@ movies <- basics %>%  filter(titleType %in% keeptypes) %>%
 movie_ids <- movies %>% select(tconst)
 movie_ids_current <- movies %>% filter(startYear==format(Sys.Date(), "%Y")) %>% select(tconst)
 
-if (file.exists(paste0(DATA_DIR,"/parental.RData"))){
-  load(file=paste0(DATA_DIR,"/parental.RData"))
+if (file.exists(paste0(DATA_DIR,"parental.RData"))){
+  load(file=paste0(DATA_DIR,"parental.RData"))
 } else {
   parental <- guide_rip(movie_ids$tconst[1])  # Initialise votes data frame
 }
@@ -115,7 +115,7 @@ while(nrow(movie_ids)>0){
   }
   print("Saving Movie Votes Data Frame")
   parental <- parental %>% unique()
-  save(parental,file=paste0(DATA_DIR,"/parental.RData"))
+  save(parental,file=paste0(DATA_DIR,"parental.RData"))
   parent_ids <- parental %>% select(tconst)
   movie_ids <- movie_ids %>% anti_join(parent_ids)
 }
@@ -150,8 +150,8 @@ parental_guide <- parental_guide[c("tconst","titleType","primaryTitle","original
                  "profanity",      "drugs", "intense" ,  "sex_code",      
                  "violence_code",  "profanity_code", "drug_code","intense_code", "mpaa" ,"certificate") ]
 
-save(parental_guide,file=paste0(DATA_DIR,"/parental_guide.Rdata"))
-write.csv(parental_guide,paste0(DATA_DIR,"/IMDB_parental_guide.csv"),row.names = FALSE)
+save(parental_guide,file=paste0(DATA_DIR,"parental_guide.Rdata"))
+write.csv(parental_guide,paste0(DATA_DIR,"IMDB_parental_guide.csv"),row.names = FALSE)
 
 table(parental_guide$titleType)
 

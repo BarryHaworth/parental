@@ -8,12 +8,12 @@ library(tidyr)
 library(dplyr)
 library(rmutil)
 
-PROJECT_DIR <- "c:/R/parental"
-DATA_DIR    <- paste0(PROJECT_DIR,"/data")
-FILE_DIR    <- paste0(DATA_DIR,"/tsv")
+PROJECT_DIR <- "c:/R/parental/"
+DATA_DIR    <- paste0(PROJECT_DIR,"data/")
+FILE_DIR    <- paste0(DATA_DIR,"tsv/")
 
 get_title <- function(file){
-  local_file <- paste0(FILE_DIR,"/",file,".tsv.gz")
+  local_file <- paste0(FILE_DIR,file,".tsv.gz")
   remote_file <- paste0("https://datasets.imdbws.com/",file,".tsv.gz")
   if (!file.exists(local_file)) {
     print(paste("Downloading New File:",remote_file,"to Local file:",local_file)) 
@@ -38,14 +38,14 @@ get_title("title.basics")
 #get_title("title.akas")
 
 # Episodes
-episode  <- read.delim(paste0(FILE_DIR,"/title.episode.tsv.gz") ,stringsAsFactors = FALSE ,quote="")
-save(episode,file=paste0(DATA_DIR,"/episode.RData"))   # Save Episode Data Frame
+episode  <- read.delim(paste0(FILE_DIR,"title.episode.tsv.gz") ,stringsAsFactors = FALSE ,quote="")
+save(episode,file=paste0(DATA_DIR,"episode.RData"))   # Save Episode Data Frame
 
 episodes <- episode %>% select(parentTconst) %>% group_by(parentTconst) %>% 
             summarise(episodes = n()) %>% rename(tconst=parentTconst)
-save(episodes,file=paste0(DATA_DIR,"/episodes.RData"))   # Save Episodes Data Frame
+save(episodes,file=paste0(DATA_DIR,"episodes.RData"))   # Save Episodes Data Frame
 
-basics  <- read.delim(paste0(FILE_DIR,"/title.basics.tsv.gz") ,stringsAsFactors = FALSE ,quote="")
+basics  <- read.delim(paste0(FILE_DIR,"title.basics.tsv.gz") ,stringsAsFactors = FALSE ,quote="")
 
 # Set types for columns
 basics$isAdult   <- as.numeric(basics$isAdult)
@@ -70,8 +70,8 @@ basics <- basics %>%
   replace_na(list(episodes=1))    %>%  
   mutate(totalRuntime=ifelse(titleType=="tvSeries", episodes*runtimeMinutes,runtimeMinutes))
 
-save(basics,file=paste0(DATA_DIR,"/basics.RData"))
+save(basics,file=paste0(DATA_DIR,"basics.RData"))
 
 # Ratings
-ratings <- read.delim(paste0(FILE_DIR,"/title.ratings.tsv.gz") ,stringsAsFactors = FALSE ,quote="")
-save(ratings,file=paste0(DATA_DIR,"/ratings.RData"))
+ratings <- read.delim(paste0(FILE_DIR,"title.ratings.tsv.gz") ,stringsAsFactors = FALSE ,quote="")
+save(ratings,file=paste0(DATA_DIR,"ratings.RData"))

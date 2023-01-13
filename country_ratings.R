@@ -9,12 +9,12 @@ library(dplyr)
 library(ggplot2)
 library(forcats)
 
-PROJECT_DIR <- "c:/R/parental"
-DATA_DIR    <- paste0(PROJECT_DIR,"/data")
-PLOT_DIR    <- paste0(PROJECT_DIR,"/plot")
+PROJECT_DIR <- "c:/R/parental/"
+DATA_DIR    <- paste0(PROJECT_DIR,"data/")
+PLOT_DIR    <- paste0(PROJECT_DIR,"plot/")
 
-load(paste0(DATA_DIR,"/parental_guide.RData"))
-load(paste0(DATA_DIR,"/country_certificate.RData"))
+load(paste0(DATA_DIR,"parental_guide.RData"))
+load(paste0(DATA_DIR,"country_certificate.RData"))
 
 names(parental_guide)
 names(country_certificate)
@@ -61,7 +61,7 @@ for (c_name in head(cc_table$country,10)){
 mpaa <- c("G","PG","PG-13","R","X","NC-17")  # MPAA ratings
 cc_us <- country_certificate %>% filter(country=="United States") %>% filter(certificate %in% mpaa) %>% select(-certificates) %>% unique()
 pg_us <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_us,by="tconst")  
-save(pg_us,file=paste0(DATA_DIR,"/pg_us.Rdata"))
+save(pg_us,file=paste0(DATA_DIR,"pg_us.Rdata"))
 
 table(cc_us$certificate)
 table(pg_us$certificate)
@@ -71,7 +71,7 @@ table(pg_us$certificate)
 bbfc <- c("U","PG","12A","12","15","18","R18")
 cc_uk <- country_certificate %>% filter(country=="United Kingdom") %>% filter(certificate %in% bbfc) %>% select(-certificates) %>% unique()
 pg_uk <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_uk,by="tconst")
-save(pg_uk,file=paste0(DATA_DIR,"/pg_uk.Rdata"))
+save(pg_uk,file=paste0(DATA_DIR,"pg_uk.Rdata"))
 
 table(pg_uk$certificate)
 table(cc_uk$certificate)
@@ -81,7 +81,7 @@ table(cc_uk$certificate)
 cmprs <- c("G","PG","14A","18A","R","A","13+","16+","18+")
 cc_can <- country_certificate %>% filter(country=="Canada") %>% filter(certificate %in% cmprs) %>% select(-certificates) %>% unique()
 pg_can <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_can,by="tconst")
-save(pg_can,file=paste0(DATA_DIR,"/pg_can.Rdata"))
+save(pg_can,file=paste0(DATA_DIR,"pg_can.Rdata"))
 
 table(pg_can$certificate)
 
@@ -91,7 +91,7 @@ table(pg_can$certificate)
 acb <- c("G","PG","M","MA","MA15+","R","R18+")
 cc_aus <- country_certificate %>% filter(country=="Australia") %>% filter(certificate %in% acb) %>% select(-certificates) %>% unique()
 pg_aus <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_aus,by="tconst")
-save(pg_aus,file=paste0(DATA_DIR,"/pg_aus.Rdata"))
+save(pg_aus,file=paste0(DATA_DIR,"pg_aus.Rdata"))
 
 table(pg_aus$certificate)
 
@@ -101,6 +101,6 @@ table(pg_aus$certificate)
 fsk <- c("0","6","12","16","18")
 cc_deu <- country_certificate %>% filter(country=="Germany") %>% filter(certificate %in% fsk) %>% select(-certificates) %>% unique()
 pg_deu <- parental_guide_any %>% select(-certificate) %>% inner_join(cc_deu,by="tconst")
-save(pg_deu,file=paste0(DATA_DIR,"/pg_deu.Rdata"))
+save(pg_deu,file=paste0(DATA_DIR,"pg_deu.Rdata"))
 
 table(pg_deu$certificate)

@@ -13,10 +13,10 @@ library(tidyr)
 library(stringr)
 library(rmutil)
 
-PROJECT_DIR <- "c:/R/parental"
-DATA_DIR    <- paste0(PROJECT_DIR,"/data")
+PROJECT_DIR <- "c:/R/parental/"
+DATA_DIR    <- paste0(PROJECT_DIR,"data/")
 
-load(file=paste0(DATA_DIR,"/parental_guide.Rdata"))
+load(file=paste0(DATA_DIR,"parental_guide.Rdata"))
 
 # Get the Certificate field
 
@@ -30,5 +30,5 @@ country_certificate <- parental_guide %>% select(tconst,certificate) %>%
   
 head(country_certificate)
 
-save(country_certificate,file=paste0(DATA_DIR,"/country_certificate.Rdata"))
-write.csv(country_certificate,paste0(DATA_DIR,"/country_certificate.csv"),row.names = FALSE)
+save(country_certificate,file=paste0(DATA_DIR,"country_certificate.Rdata"))
+write.csv(country_certificate,paste0(DATA_DIR,"country_certificate.csv"),row.names = FALSE)

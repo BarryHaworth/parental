@@ -19,19 +19,19 @@ library(dplyr)
 library(ggplot2)
 library(forcats)
 
-PROJECT_DIR <- "c:/R/parental"
-DATA_DIR    <- paste0(PROJECT_DIR,"/data")
-PLOT_DIR    <- paste0(PROJECT_DIR,"/plot")
+PROJECT_DIR <- "c:/R/parental/"
+DATA_DIR    <- paste0(PROJECT_DIR,"data/")
+PLOT_DIR    <- paste0(PROJECT_DIR,"plot/")
 
-load(paste0(DATA_DIR,"/parental_guide.RData"))
-load(paste0(DATA_DIR,"/country_certificate.RData"))
+load(paste0(DATA_DIR,"parental_guide.RData"))
+load(paste0(DATA_DIR,"country_certificate.RData"))
 
 # Load Country guides
-load(paste0(DATA_DIR,"/pg_us.RData"))
-load(paste0(DATA_DIR,"/pg_uk.RData"))
-load(paste0(DATA_DIR,"/pg_can.RData"))
-load(paste0(DATA_DIR,"/pg_aus.RData"))
-load(paste0(DATA_DIR,"/pg_deu.RData"))
+load(paste0(DATA_DIR,"pg_us.RData"))
+load(paste0(DATA_DIR,"pg_uk.RData"))
+load(paste0(DATA_DIR,"pg_can.RData"))
+load(paste0(DATA_DIR,"pg_aus.RData"))
+load(paste0(DATA_DIR,"pg_deu.RData"))
 
 table(parental_guide$startYear)
 par(mar=c(2,2,2,2))
@@ -59,13 +59,13 @@ summary(parental_guide[guides])
 summary(parental_guide[codes])
 
 # Plots
-png(paste0(PLOT_DIR,"/total_titles.png"),width=800,height=800)
+png(paste0(PLOT_DIR,"total_titles.png"),width=800,height=800)
 ggplot(data=parental_guide) +
   geom_histogram((aes(x=startYear)),  fill="cornflowerblue" ,binwidth = 1) +
   ggtitle("Total Titles by Year 1980 - 2022")
 dev.off()
 
-png(paste0(PLOT_DIR,"/total_types.png"),width=800,height=800)
+png(paste0(PLOT_DIR,"total_types.png"),width=800,height=800)
 ggplot(data=parental_guide, aes(x=startYear,fill=titleType)) +
   geom_bar() +
   ggtitle("Titles by Type by Year 1980 - 2022")
@@ -82,7 +82,7 @@ pg_year <- parental_guide %>% group_by(startYear) %>%
                      intense = mean(intense_code,na.rm=T)
                      )
 
-png(paste0(PLOT_DIR,"/ave_ratings.png"),width=800,height=800)
+png(paste0(PLOT_DIR,"ave_ratings.png"),width=800,height=800)
 ggplot(data=pg_year, aes(x=startYear)) +
   geom_line(aes(y=sex,       colour="sex"),size=1) +
   geom_line(aes(y=drugs,     colour="drugs"),size=1) +
@@ -111,7 +111,7 @@ pg_year_us <- parental_guide %>% select(-c(mpaa,certificate)) %>%
 
 mpaa <- c("G","PG","PG-13","R","X","NC-17")  # MPAA ratings
 
-png(paste0(PLOT_DIR,"/us_rating_g.png"),width=800,height=800)
+png(paste0(PLOT_DIR,"us_rating_g.png"),width=800,height=800)
 ggplot(data=pg_year_us %>% filter(certificate=="G") , aes(x=startYear)) +
   geom_line(aes(y=sex,       colour="sex"),size=1) +
   geom_line(aes(y=drugs,     colour="drugs"),size=1) +
@@ -124,7 +124,7 @@ ggplot(data=pg_year_us %>% filter(certificate=="G") , aes(x=startYear)) +
   theme(legend.position = "bottom")
 dev.off()
 
-png(paste0(PLOT_DIR,"/us_rating_pg.png"),width=800,height=800)
+png(paste0(PLOT_DIR,"us_rating_pg.png"),width=800,height=800)
 ggplot(data=pg_year_us %>% filter(certificate=="PG") , aes(x=startYear)) +
   geom_line(aes(y=sex,       colour="sex"),size=1) +
   geom_line(aes(y=drugs,     colour="drugs"),size=1) +
@@ -137,7 +137,7 @@ ggplot(data=pg_year_us %>% filter(certificate=="PG") , aes(x=startYear)) +
   theme(legend.position = "bottom")
 dev.off()
 
-png(paste0(PLOT_DIR,"/us_rating_pg-13.png"),width=800,height=800)
+png(paste0(PLOT_DIR,"us_rating_pg-13.png"),width=800,height=800)
 ggplot(data=pg_year_us %>% filter(certificate=="PG-13", startYear >= 1984) , aes(x=startYear)) +
   geom_line(aes(y=sex,       colour="sex"),size=1) +
   geom_line(aes(y=drugs,     colour="drugs"),size=1) +
@@ -150,7 +150,7 @@ ggplot(data=pg_year_us %>% filter(certificate=="PG-13", startYear >= 1984) , aes
   theme(legend.position = "bottom")
 dev.off()
 
-png(paste0(PLOT_DIR,"/us_rating_r.png"),width=800,height=800)
+png(paste0(PLOT_DIR,"us_rating_r.png"),width=800,height=800)
 ggplot(data=pg_year_us %>% filter(certificate=="R") , aes(x=startYear)) +
   geom_line(aes(y=sex,       colour="sex"),size=1) +
   geom_line(aes(y=drugs,     colour="drugs"),size=1) +

@@ -17,12 +17,12 @@ options(timeout= 4000000)
 print("Program started")
 timestamp()
 
-PROJECT_DIR <- "c:/R/parental"
-DATA_DIR    <- paste0(PROJECT_DIR,"/data")
-FILE_DIR    <- paste0(DATA_DIR,"/tsv")
+PROJECT_DIR <- "c:/R/parental/"
+DATA_DIR    <- paste0(PROJECT_DIR,"data/")
+FILE_DIR    <- paste0(DATA_DIR,"tsv/")
 
-load(paste0(DATA_DIR,"/basics.RData"))
-load(paste0(DATA_DIR,"/ratings.RData"))
+load(paste0(DATA_DIR,"basics.RData"))
+load(paste0(DATA_DIR,"ratings.RData"))
 
 # Read Parental Guidance details for a single movie
 detail_rip <- function(tconst){
@@ -122,8 +122,8 @@ movies <- basics %>%  filter(titleType %in% keeptypes) %>%
 movie_ids <- movies %>% select(tconst)
 movie_ids_current <- movies %>% filter(startYear==format(Sys.Date(), "%Y")) %>% select(tconst)
 
-if (file.exists(paste0(DATA_DIR,"/parental_detail.RData"))){
-  load(file=paste0(DATA_DIR,"/parental_detail.RData"))
+if (file.exists(paste0(DATA_DIR,"parental_detail.RData"))){
+  load(file=paste0(DATA_DIR,"parental_detail.RData"))
 } else {
   parental_detail <- detail_rip(movie_ids$tconst[1])  # Initialise votes data frame
 }
@@ -185,8 +185,8 @@ parental_detail_guide <- movies %>% select(-numVotes) %>%
   )
 
 
-save(parental_detail_guide,file=paste0(DATA_DIR,"/parental_detail_guide.Rdata"))
-write.csv(parental_detail_guide,paste0(DATA_DIR,"/IMDB_parental_detail_guide.csv"),row.names = FALSE)
+save(parental_detail_guide,file=paste0(DATA_DIR,"parental_detail_guide.Rdata"))
+write.csv(parental_detail_guide,paste0(DATA_DIR,"IMDB_parental_detail_guide.csv"),row.names = FALSE)
 
 summary(parental_detail_guide %>% select(sex_total,violence_total, profanity_total,drugs_total,intense_total))
 hist(parental_detail_guide$sex_total)
