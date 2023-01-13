@@ -68,59 +68,34 @@ ggplot(pg_melt, aes(x=startYear, y=rating, color=guide)) +
   theme(legend.position = "bottom")
 dev.off()
 
-# Redo these as a loop?
-for (guide in guides){
-  
+# US Ratings by Guide as a loop
+for (g in guides){
+  single_guide <- pg_melt %>% filter(guide==g)
+  print(paste0("Plotting ",g," to ","pg_us_",g,".png"))
+  png(paste0(PLOT_DIR,"pg_us_",g,".png"),width=800,height=800)
+  print(ggplot(single_guide , aes(x=startYear, y=rating, color=certificate)) + 
+    stat_summary(fun=mean, geom="line", size=1)+
+    ggtitle(paste(str_to_title(g),"Rating by Year and Certificate")) +
+    theme(plot.title=element_text(hjust=0.5))+
+    xlab("Year")+ylab("Level") + labs(color="MPAA Certificate")+ 
+    scale_y_continuous(limits=c(1,4),breaks=c(1,2,3,4),labels=c("None","Mild","Moderate","Severe"))+
+    theme(legend.position = "bottom"))
+  dev.off()
 }
 
+# US Ratings by MPAA as a loop
+for (cert in mpaa_sub){
+  single_cert <- pg_melt %>% filter(certificate==cert)
+  print(paste0("Plotting ",cert," to ","pg_us_",cert,".png"))
+  png(paste0(PLOT_DIR,"pg_us_",cert,".png"),width=800,height=800)
+  print(ggplot(single_cert , aes(x=startYear, y=rating, color=guide)) + 
+    stat_summary(fun=mean, geom="line", size=1)+
+    ggtitle(paste(cert,"Rating by Year and Parental Guide")) +
+    theme(plot.title=element_text(hjust=0.5))+
+    xlab("Year")+ylab("Level") + labs(color="Parental Guide")+ 
+    scale_y_continuous(limits=c(1,4),breaks=c(1,2,3,4),labels=c("None","Mild","Moderate","Severe"))+
+    theme(legend.position = "bottom"))
+  dev.off()
+}
 
-png(paste0(PLOT_DIR,"pg_us_sex.png"),width=800,height=800)
-ggplot(pg_melt %>% filter(guide=="sex"), aes(x=startYear, y=rating, color=certificate)) + 
-  stat_summary(fun=mean, geom="line", size=1)+
-  ggtitle("Sex Rating by Year and Certificate") +
-  theme(plot.title=element_text(hjust=0.5))+
-  xlab("Year")+ylab("Level") + labs(color="MPAA Certificate")+ 
-  scale_y_continuous(limits=c(1,4),breaks=c(1,2,3,4),labels=c("None","Mild","Moderate","Severe"))+
-  theme(legend.position = "bottom")
-dev.off()
-
-png(paste0(PLOT_DIR,"pg_us_violence.png"),width=800,height=800)
-ggplot(pg_melt %>% filter(guide=="violence"), aes(x=startYear, y=rating, color=certificate)) + 
-  stat_summary(fun=mean, geom="line", size=1)+
-  ggtitle("Violence Rating by Year and Certificate") +
-  theme(plot.title=element_text(hjust=0.5))+
-  xlab("Year")+ylab("Level") + labs(color="MPAA Certificate")+ 
-  scale_y_continuous(limits=c(1,4),breaks=c(1,2,3,4),labels=c("None","Mild","Moderate","Severe"))+
-  theme(legend.position = "bottom")
-dev.off()
-
-png(paste0(PLOT_DIR,"pg_us_profanity.png"),width=800,height=800)
-ggplot(pg_melt %>% filter(guide=="profanity"), aes(x=startYear, y=rating, color=certificate)) + 
-  stat_summary(fun=mean, geom="line", size=1)+
-  ggtitle("Profanity Rating by Year and Certificate") +
-  theme(plot.title=element_text(hjust=0.5))+
-  xlab("Year")+ylab("Level") + labs(color="MPAA Certificate")+ 
-  scale_y_continuous(limits=c(1,4),breaks=c(1,2,3,4),labels=c("None","Mild","Moderate","Severe"))+
-  theme(legend.position = "bottom")
-dev.off()
-
-png(paste0(PLOT_DIR,"pg_us_drugs.png"),width=800,height=800)
-ggplot(pg_melt %>% filter(guide=="drugs"), aes(x=startYear, y=rating, color=certificate)) + 
-  stat_summary(fun=mean, geom="line", size=1)+
-  ggtitle("Drugs & Alcohol Rating by Year and Certificate") +
-  theme(plot.title=element_text(hjust=0.5))+
-  xlab("Year")+ylab("Level") + labs(color="MPAA Certificate")+ 
-  scale_y_continuous(limits=c(1,4),breaks=c(1,2,3,4),labels=c("None","Mild","Moderate","Severe"))+
-  theme(legend.position = "bottom")
-dev.off()
-
-png(paste0(PLOT_DIR,"pg_us_intense.png"),width=800,height=800)
-ggplot(pg_melt %>% filter(guide=="intense"), aes(x=startYear, y=rating, color=certificate)) + 
-  stat_summary(fun=mean, geom="line", size=1)+
-  ggtitle("Frightening & Intense Rating by Year and Certificate") +
-  theme(plot.title=element_text(hjust=0.5))+
-  xlab("Year")+ylab("Level") + labs(color="MPAA Certificate")+ 
-  scale_y_continuous(limits=c(1,4),breaks=c(1,2,3,4),labels=c("None","Mild","Moderate","Severe"))+
-  theme(legend.position = "bottom")
-dev.off()
 
