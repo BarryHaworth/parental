@@ -90,8 +90,8 @@ for (cty in countries){
   pg_melt$score  <- as.numeric(pg_melt$level)  # Numeric value to parental guide 
   pg_melt$score  <- pg_melt$score-1             # Adjust to scale 0-3 instead of 1-4
   
-  #png(paste0(PLOT_DIR,"pg_",cty,"_all.png"),width=800,height=800)
-  svg(paste0(PLOT_DIR,"pg_",cty,"_all.svg"))
+  png(paste0(PLOT_DIR,"pg_",cty,"_all.png"),width=800,height=800)
+  #svg(paste0(PLOT_DIR,"pg_",cty,"_all.svg"))
   print(ggplot(pg_melt, aes(x=startYear, y=score, color=guide)) + 
     stat_summary(fun=mean, geom="line", size=1)+
     ggtitle(paste(name,"Parental Guides by Year and Guide")) +
@@ -105,8 +105,8 @@ for (cty in countries){
   for (gde in guides){
     single_guide <- pg_melt %>% filter(guide==gde)
     print(paste0("Plotting ",gde," to ","pg_",cty,"_",gde,".png"))
-    #png(paste0(PLOT_DIR,"pg_",cty,"_",gde,".png"),width=800,height=800)
-    svg(paste0(PLOT_DIR,"pg_",cty,"_",gde,".svg"))
+    png(paste0(PLOT_DIR,"pg_",cty,"_",gde,".png"),width=800,height=800)
+    #svg(paste0(PLOT_DIR,"pg_",cty,"_",gde,".svg"))
     print(ggplot(single_guide , aes(x=startYear, y=score, color=certificate)) + 
             stat_summary(fun=mean, geom="line", size=1)+
             ggtitle(paste(name,str_to_title(gde),"Rating by Year and Certificate")) +
@@ -121,8 +121,8 @@ for (cty in countries){
   for (cert in certificates){
     single_cert <- pg_melt %>% filter(certificate==cert)
     print(paste0("Plotting ",cert," to ","pg_",cty,"_",cert,".png"))
-    #png(paste0(PLOT_DIR,"pg_",cty,"_",cert,".png"),width=800,height=800)
-    svg(paste0(PLOT_DIR,"pg_",cty,"_",cert,".svg"))
+    png(paste0(PLOT_DIR,"pg_",cty,"_",cert,".png"),width=800,height=800)
+    #svg(paste0(PLOT_DIR,"pg_",cty,"_",cert,".svg"))
     print(ggplot(single_cert , aes(x=startYear, y=score, color=guide)) + 
             stat_summary(fun=mean, geom="line", size=1)+
             ggtitle(paste(name,cert,"Rating by Year and Parental Guide")) +
@@ -162,8 +162,8 @@ for (cty in countries){
       
       #Line Superimposed on Area
       print(paste0("Plotting Certificate ",cert," and Guide ",gde," to ","pg_",cty,"_",cert,"_",gde,".png"))
-      #png(paste0(PLOT_DIR,"pg_",cty,"_",cert,"_",gde,".png"),width=800,height=800)
-      svg(paste0(PLOT_DIR,"pg_",cty,"_",cert,"_",gde,".svg"))
+      png(paste0(PLOT_DIR,"pg_",cty,"_",cert,"_",gde,".png"),width=800,height=800)
+      #svg(paste0(PLOT_DIR,"pg_",cty,"_",cert,"_",gde,".svg"))
       print(ggplot() +
               geom_area(data=single_gc , aes(x=startYear, y=title_pct,  fill=fct_rev(level)), alpha=0.6 , size=0.1) +
               geom_line(data=single_gc_ave , aes(x=startYear, y=ave_score)) +

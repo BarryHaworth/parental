@@ -1,0 +1,22 @@
+Hi there Pedro!  Barry here, finally getting back to this after way too long.  
+I did not get to updating the plots immediately because what was wanted needed a fair bit of focussed effort that I didn't immediately have the time for.  Then life happened and I put it aside and forgot about it for a few months.  If you have completed your research or moved on to other things I will not be at all surprised.  I did open it up and tinker with the data a few times along the way, but didn't have time to sit down and do the graphs until recently.  A New Years resolution, more or less.
+
+Moving on to the update.  First, I have updated the data.  If you go to https://www.kaggle.com/datasets/barryhaworth/imdb-parental-guide you will see that I have updated the data files.  
+
+Data Updates are:
+* the data has been updated to 14th January 2023
+* the files contain a few extra title types (video and tvSpecial)
+* there is an extra file where I have captured the number of votes each title receives for each parental guide, by level. That is, the number of votes a title gets for sex:None, Sex:Mild, etc, as well as the total number of votes cast for each parental guide.
+
+That last addition was because I wanted to get an idea about how reliable the parental guide ratings are overall.  The data extracted is all titles with more than 1000 votes (ratings) overall, but the number of votes for parental guides can be a lot smaller.  Of more concern, a title can get a lot of votes for one guide (sex is generally popular) but few or none for others.  Capturing the number of votes for each guide will be useful in working out how reliable the data is.
+
+Second, I have updated the graphs.  I have redone the graphs based on the US ratings.  To ensure consistency from one graph to the next, I have excluded titles where which did not have all five Parental Guides.  That is, if a title had a Sex rating but not a Drugs rating I did not include it.  Second, I have looked at the major MPAA movie ratings only.  The plots contain the ratings G, PG, PG-13 and R.  Ratings X and NC-17 do not have enough titles to give a consistent picture over time and have been omitted.
+
+Graphs have been saved in SVG (Scalable Vector Graphics) format, and include data from 1980 to 2022.  I can easily change the date range and the format if desired.
+
+The graphs I have done are:
+
+pg_us_all:	Parental guides over time for all movies, one line per guide.  In this graph we see that the Sex rating has dropped over time while the others have stayed pretty steady.
+pg_us_[Guide]:  Plots of each Parental Guide (Sex, violence, profanity, violence, intense) with separate lines for each MPAA rating. (5 plots)
+pg_us_[rating]: Plots for each MPAA rating, with eparate lines for the parental guides over time. (4 plots)
+pg_us_[rating]_[guide]:  The requested area plots with a line for the parental guide over time, overlayed on a stacked area plot of the individual ratings.  These plots are done for individual combinations of rating and guide (eg: PG by Sex).  (20 plots).
