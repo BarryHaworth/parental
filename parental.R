@@ -95,6 +95,10 @@ delta_vote <- ratings %>% inner_join(parental %>% select(tconst,numVotes),by="tc
 
 delta_ids <- delta_vote %>%filter(delta>1000|delta_pct>0.05) %>% arrange(-numVotes_new) %>% select(tconst)
 
+# Check for movies with incomplete parental guide.  Not doing anything with these yet.
+parental_parital <- parental %>% filter(sex==""|violence==""|profanity==""|drugs==""|intense=="")
+partial_ids  <- parental_parital %>% select(tconst)
+
 # parental   <- parental %>% anti_join(movie_ids_current)  # Update movies in current year.
 parental     <- parental %>% anti_join(delta_ids)  # Update movies which have changed.
 parent_ids   <- parental   %>% select(tconst)
