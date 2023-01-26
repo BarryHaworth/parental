@@ -3,6 +3,7 @@
 # Files are filtered to include movies & TV series/miniseries only
 # 22/06/2022  Fixed a reading error where quote in text were messing things up.
 # copied from two_goats to the new parental project
+# 26/01/2023  Added dir.create for running in new environment.
 
 library(tidyr)
 library(dplyr)
@@ -11,6 +12,9 @@ library(rmutil)
 PROJECT_DIR <- "c:/R/parental/"
 DATA_DIR    <- paste0(PROJECT_DIR,"data/")
 FILE_DIR    <- paste0(DATA_DIR,"tsv/")
+
+dir.create(DATA_DIR)
+dir.create(FILE_DIR)
 
 get_title <- function(file){
   local_file <- paste0(FILE_DIR,file,".tsv.gz")
