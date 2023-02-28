@@ -13,16 +13,6 @@ DATA_DIR    <- paste0(PROJECT_DIR,"data/")
 # Read the data
 load(file=paste0(DATA_DIR,"/parental_guide.RData"))
 
-# Rip the keywords page - test
-tconst <- parental_guide$tconst[1]
-tconst <- "tt0120855"  # Disney Tarzan
-#tconst <- "tt0304141"  # Harry Potter
-url <- paste0('https://www.imdb.com/title/',tconst,'/keywords')
-webpage <- read_html(url)
-tag_html <- html_nodes(webpage,'.sodatext')
-tags <- trimws(gsub('[\n]', '', html_text(tag_html)))
-keywords <- data.frame("tconst"=tconst,"keywords"=tags)
-
 # create a keywords dataframe
 movie_keys <- function(id){
   url <- paste0('https://www.imdb.com/title/',id,'/keywords')
