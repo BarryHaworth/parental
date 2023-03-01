@@ -18,11 +18,12 @@ scrape_summary <- function(id){
   url <- paste0('https://www.imdb.com/title/',id,'/plotsummary')
   webpage <- read_html(url)
   summary_html <- html_nodes(webpage,'.ipc-page-section--base')
+  tconst <- id
   title_summary <- trimws( html_text(summary_html[1]))
   title_summary <-  substr(title_summary,10,9999999)
   title_synopsis <- trimws( html_text(summary_html[2]))
   title_synopsis <-  substr(title_synopsis,9,9999999)
-  plotsummary    <- data.frame(id,title_summary,title_synopsis,stringsAsFactors=FALSE)
+  plotsummary    <- data.frame(tconst,title_summary,title_synopsis,stringsAsFactors=FALSE)
   return(plotsummary)
 }
 
@@ -48,12 +49,11 @@ while(nrow(movies_notyet)>0){
   print(paste("Movies Looked up:",length(looked_up),"Remaining:",nrow((movies_notyet))))
   for (i in 1:min(100,nrow(movies_notyet))){
     tryCatch({
-      keys <- scrape_summary(movies_notyet$tconst[i])
+      title_summary <- scrape_summary(movies_notyet$tconst[i])
       print(paste(i,"Movie:",movies_notyet$tconst[i],
                   "votes:",movies_notyet$numVotes[i],
-                  "# keywords:",nrow(keys),
                   "title:",movies_notyet$primaryTitle[i]))
-      pg_summary <- bind_rows(pg_summary,keys)
+      pg_summary <- bind_rows(pg_summary,title_summary)
     }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
   }
   print("Saving Keywords Data Frame")
