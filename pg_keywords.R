@@ -46,12 +46,16 @@ while(nrow(movies_notyet)>0){
   print(paste("Movies Looked up:",length(looked_up),"Remaining:",nrow((movies_notyet))))
   for (i in 1:min(100,nrow(movies_notyet))){
     tryCatch({
-      print(paste(i,"Movie",movies_notyet$tconst[i]
-                  ,movies_notyet$primaryTitle[i]))
       keys <- movie_keys(movies_notyet$tconst[i])
+      print(paste(i,"Movie:",movies_notyet$tconst[i],
+                  "votes:",movies_notyet$numVotes[i],
+                  "# keywords:",nrow(keys),
+                  "title:",movies_notyet$primaryTitle[i]))
       pg_keywords <- bind_rows(pg_keywords,keys)
     }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
   }
   print("Saving Keywords Data Frame")
   save(pg_keywords,file=paste0(DATA_DIR,"/pg_keywords.RData"))
 }
+
+write.csv(pg_keywords,paste0(DATA_DIR,"pg_keywords.csv"),row.names = FALSE)
