@@ -11,7 +11,7 @@ PROJECT_DIR <- "c:/R/parental/"
 DATA_DIR    <- paste0(PROJECT_DIR,"data/")
 
 # Read the data
-load(file=paste0(DATA_DIR,"/parental_guide.RData"))
+load(file=paste0(DATA_DIR,"parental_guide.RData"))
 
 # create a keywords dataframe
 movie_keys <- function(id){
@@ -25,8 +25,8 @@ movie_keys <- function(id){
 }
 
 # If the saved Movie keywords data exists, read it.
-if (file.exists(paste0(DATA_DIR,"/pg_keywords.RData"))) {
-  load(paste0(DATA_DIR,"/pg_keywords.RData"))
+if (file.exists(paste0(DATA_DIR,"pg_keywords.RData"))) {
+  load(paste0(DATA_DIR,"pg_keywords.RData"))
 }
 
 # If the local file does not exist, initialise it
@@ -55,7 +55,7 @@ while(nrow(movies_notyet)>0){
     }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
   }
   print("Saving Keywords Data Frame")
-  save(pg_keywords,file=paste0(DATA_DIR,"/pg_keywords.RData"))
+  save(pg_keywords,file=paste0(DATA_DIR,"pg_keywords.RData"))
 }
 
 write.csv(pg_keywords,paste0(DATA_DIR,"pg_keywords.csv"),row.names = FALSE)

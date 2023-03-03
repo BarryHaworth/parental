@@ -11,7 +11,7 @@ PROJECT_DIR <- "c:/R/parental/"
 DATA_DIR    <- paste0(PROJECT_DIR,"data/")
 
 # Read the data
-load(file=paste0(DATA_DIR,"/parental_guide.RData"))
+load(file=paste0(DATA_DIR,"parental_guide.RData"))
 
 # create a keywords dataframe
 scrape_summary <- function(id){
@@ -20,16 +20,16 @@ scrape_summary <- function(id){
   summary_html <- html_nodes(webpage,'.ipc-page-section--base')
   tconst <- id
   title_summary <- trimws( html_text(summary_html[1]))
-  title_summary <-  substr(title_summary,10,9999999)
+  title_summary <-  gsub("\n"," ",substr(title_summary,10,9999999))
   title_synopsis <- trimws( html_text(summary_html[2]))
-  title_synopsis <-  substr(title_synopsis,9,9999999)
+  title_synopsis <-  gsub("\n"," ",substr(title_synopsis,9,9999999))
   plotsummary    <- data.frame(tconst,title_summary,title_synopsis,stringsAsFactors=FALSE)
   return(plotsummary)
 }
 
 # If the saved Movie keywords data exists, read it.
-if (file.exists(paste0(DATA_DIR,"/pg_summary.RData"))) {
-  load(paste0(DATA_DIR,"/pg_summary.RData"))
+if (file.exists(paste0(DATA_DIR,"pg_summary.RData"))) {
+  load(paste0(DATA_DIR,"pg_summary.RData"))
 }
 
 # If the local file does not exist, initialise it
@@ -56,8 +56,9 @@ while(nrow(movies_notyet)>0){
       pg_summary <- bind_rows(pg_summary,title_summary)
     }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
   }
-  print("Saving Keywords Data Frame")
-  save(pg_summary,file=paste0(DATA_DIR,"/pg_summary.RData"))
+  print("Saving Plot Summary Data Frame")
+  save(pg_summary,file=paste0(DATA_DIR,"pg_summary.RData"))
 }
 
-write.csv(pg_summary,paste0(DATA_DIR,"pg_summary.csv"),row.names = FALSE)
+write.csv(pg_summary %>% select(-"title_synopsis"),paste0(DATA_DIR,"pg_summary.csv"),row.names = FALSE)
+write.csv(pg_summary %>% select(-"title_summary"),paste0(DATA_DIR,"pg_synopsis.csv"),row.names = FALSE)

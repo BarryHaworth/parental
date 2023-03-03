@@ -1,5 +1,8 @@
 #  Investigate the composition of the family guide data
 #  Looking at those titles where guide information is incomplete.
+#
+# To Do:  Look at which movies have or do not have guides, keywords, summary & Synopsis.
+# Note: Many records have synopsis "It looks like we don't have any synopsis for this title yet. Be the first to contribute.Learn more"
 
 library(dplyr)
 library(ggplot2)
@@ -10,6 +13,8 @@ DATA_DIR    <- paste0(PROJECT_DIR,"data/")
 PLOT_DIR    <- paste0(PROJECT_DIR,"plot/")
 
 load(paste0(DATA_DIR,"parental_detail_guide.RData"))
+load(paste0(DATA_DIR,"pg_keywords.RData"))
+load(paste0(DATA_DIR,"pg_summary.RData"))
 
 #names(parental_guide)
 names(parental_detail_guide)
