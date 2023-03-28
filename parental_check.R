@@ -16,6 +16,17 @@ load(paste0(DATA_DIR,"parental_detail_guide.RData"))
 load(paste0(DATA_DIR,"pg_keywords.RData"))
 load(paste0(DATA_DIR,"pg_summary.RData"))
 
+pg_synopsis <- pg_summary %>% 
+  select(-"title_summary") %>% 
+  filter(title_synopsis!="It looks like we don't have any synopsis for this title yet. Be the first to contribute.Learn more")
+pg_summary <- pg_summary %>% select(-"title_synopsis") 
+
+pg_key_count <- pg_keywords %>% 
+  group_by(tconst) %>%
+  summarise(key_count=n())
+
+table(pg_key_count$key_count)
+  
 #names(parental_guide)
 names(parental_detail_guide)
 

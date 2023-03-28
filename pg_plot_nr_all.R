@@ -26,7 +26,7 @@ DATA_DIR    <- paste0(PROJECT_DIR,"data/")
 PLOT_DIR    <- paste0(PROJECT_DIR,"plot/")
 
 countries <- c("us","can","uk","deu","aus")
-countries <- c("us")
+countries <- c("us")  # For testing
 guides    <- c("sex","violence","profanity","drugs","intense")  # List of Parental Guide variables
 codes     <- c("sex_code","violence_code","profanity_code","drug_code","intense_code")  # List of Parental Guide variables
 
@@ -35,6 +35,8 @@ can_certificate  <- c("G","PG","14A","18A","R","A","13+","16+","18+")
 uk_certificate   <- c("U","PG","12A","12","15","18")
 deu_certificate  <- c("0","6","12","16","18")
 aus_certificate  <- c("G","PG","M","MA","MA15+","R","R18+")
+
+cty <- "us"  # for testing
 
 for (cty in countries){
   # read the data
@@ -100,13 +102,13 @@ for (cty in countries){
   
   pg_melt$level  <- factor(pg_melt$level,levels=c("No Rating","None","Mild","Moderate","Severe"))
   pg_melt$certificate <- factor(pg_melt$certificate,levels=certificates)
-  pg_melt$score  <- as.numeric(pg_melt$level)  # Numeric value to parental guide 
-  pg_melt$score  <- pg_melt$score-1             # Adjust to scale 0-3 instead of 1-4
+  pg_melt$score  <- as.numeric(pg_melt$level)-2  # Numeric value to parental guide 
+  pg_melt$score[pg_melt$score<0]  <-0            # Adjust to scale 0-3 instead of 1-4
   
   png(paste0(PLOT_DIR,"pg_nr_",cty,"_all.png"),width=800,height=800)
   print(ggplot(pg_melt, aes(x=startYear, y=score, color=guide)) + 
     stat_summary(fun=mean, geom="line", size=1)+
-    ggtitle(paste(name,"Parental Guides by Year and Guide")) +
+    ggtitle(paste(name,"All Titles (Including No Rating) Parental Guides by Year and Guide")) +
     theme(plot.title=element_text(hjust=0.5))+
     xlab("Year")+ylab("Level") + labs(color="Type")+ 
     scale_y_continuous(limits=c(0,3),breaks=c(0,1,2,3),labels=c("None","Mild","Moderate","Severe"))+
@@ -117,10 +119,10 @@ for (cty in countries){
   for (gde in guides){
     single_guide <- pg_melt %>% filter(guide==gde)
     print(paste0("Plotting ",gde," to ","pg_nr_nr_",cty,"_",gde,".png"))
-    png(paste0(PLOT_DIR,"pg_nr_nr_",cty,"_",gde,".png"),width=800,height=800)
+    png(paste0(PLOT_DIR,"pg_nr_",cty,"_",gde,".png"),width=800,height=800)
     print(ggplot(single_guide , aes(x=startYear, y=score, color=certificate)) + 
             stat_summary(fun=mean, geom="line", size=1)+
-            ggtitle(paste(name,str_to_title(gde),"Rating by Year and Certificate")) +
+            ggtitle(paste(name,"All Titles (Including No Rating)",str_to_title(gde),"Rating by Year and Certificate")) +
             theme(plot.title=element_text(hjust=0.5))+
             xlab("Year")+ylab("Level") + labs(color="Certificate")+ 
             scale_y_continuous(limits=c(0,3),breaks=c(0,1,2,3),labels=c("None","Mild","Moderate","Severe"))+
@@ -132,10 +134,10 @@ for (cty in countries){
   for (cert in certificates){
     single_cert <- pg_melt %>% filter(certificate==cert)
     print(paste0("Plotting ",cert," to ","pg_nr_nr_",cty,"_",cert,".png"))
-    png(paste0(PLOT_DIR,"pg_nr_nr_",cty,"_",cert,".png"),width=800,height=800)
+    png(paste0(PLOT_DIR,"pg_nr_",cty,"_",cert,".png"),width=800,height=800)
     print(ggplot(single_cert , aes(x=startYear, y=score, color=guide)) + 
             stat_summary(fun=mean, geom="line", size=1)+
-            ggtitle(paste(name,cert,"Rating by Year and Parental Guide")) +
+            ggtitle(paste(name,cert,"Rating by Year and Parental Guide (Including No Rating)")) +
             theme(plot.title=element_text(hjust=0.5))+
             xlab("Year")+ylab("Level") + labs(color="Parental Guide")+ 
             scale_y_continuous(limits=c(0,3),breaks=c(0,1,2,3),labels=c("None","Mild","Moderate","Severe"))+
@@ -154,11 +156,11 @@ for (cty in countries){
       
       sum_titles <- single_gc %>% select(startYear,sum_titles) %>% unique()
       
-      single_null <- data.frame(startYear=rep(seq(1980,2022),4),
-                                level=rep(c("None","Mild","Moderate","Severe"),43),
-                                titles=rep(0,172),
-                                title_pct=rep(0,172),
-                                sum_pct=rep(3,172))
+      single_null <- data.frame(startYear=rep(seq(1980,2022),5),
+                                level=rep(c("No Rating","None","Mild","Moderate","Severe"),43),
+                                titles=rep(0,215),
+                                title_pct=rep(0,215),
+                                sum_pct=rep(4,215))
       single_null <- single_null %>% left_join(sum_titles)
       
       single_null$level <- factor(single_null$level,levels=c("No Rating","None","Mild","Moderate","Severe"))
@@ -176,11 +178,11 @@ for (cty in countries){
       print(ggplot() +
               geom_area(data=single_gc , aes(x=startYear, y=title_pct,  fill=fct_rev(level)), alpha=0.6 , size=0.1) +
               geom_line(data=single_gc_ave , aes(x=startYear, y=ave_score)) +
-              ggtitle(paste(name,"Certificate:",cert,"Parental Guide:",str_to_title(gde),"Rating by Year")) +
+              ggtitle(paste(name,"Certificate:",cert,"Parental Guide:",str_to_title(gde),"Rating by Year (Including No Rating)")) +
               theme(plot.title=element_text(hjust=0.5))+
               xlab("Year")+ylab("Level") + labs(color="Parental Guide")+ 
               guides(fill=guide_legend(title="Level:")) +
-              scale_y_continuous(limits=c(0,3),breaks=c(0,1,2,3),labels=c("No Rating","None","Mild","Moderate","Severe")) +
+              scale_y_continuous(limits=c(0,3),breaks=c(0,1,2,3),labels=c("None","Mild","Moderate","Severe")) +
               theme(legend.position = "bottom"))
       dev.off()
     }

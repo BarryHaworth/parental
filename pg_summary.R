@@ -61,4 +61,9 @@ while(nrow(movies_notyet)>0){
 }
 
 write.csv(pg_summary %>% select(-"title_synopsis"),paste0(DATA_DIR,"pg_summary.csv"),row.names = FALSE)
-write.csv(pg_summary %>% select(-"title_summary"),paste0(DATA_DIR,"pg_synopsis.csv"),row.names = FALSE)
+
+pg_synopsis <- pg_summary %>% 
+  select(-"title_summary") %>% 
+  filter(title_synopsis!="It looks like we don't have any synopsis for this title yet. Be the first to contribute.Learn more")
+save(pg_synopsis,file=paste0(DATA_DIR,"pg_synopsis.RData"))
+write.csv(pg_synopsis,paste0(DATA_DIR,"pg_synopsis.csv"),row.names = FALSE)

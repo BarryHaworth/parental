@@ -2,7 +2,6 @@
 # Plot the average value of Parental Guide scores over time.
 # For each Certificate rating look at trend in Parental Guides over time
 #
-# Changed file format to SVG instead of PNG
 
 library(dplyr)
 library(ggplot2)
@@ -23,6 +22,7 @@ DATA_DIR    <- paste0(PROJECT_DIR,"data/")
 PLOT_DIR    <- paste0(PROJECT_DIR,"plot/")
 
 countries <- c("us","can","uk","deu","aus")
+#countries <- c("us")  # For testing
 guides    <- c("sex","violence","profanity","drugs","intense")  # List of Parental Guide variables
 codes     <- c("sex_code","violence_code","profanity_code","drug_code","intense_code")  # List of Parental Guide variables
 
@@ -31,6 +31,8 @@ can_certificate  <- c("G","PG","14A","18A","R","A","13+","16+","18+")
 uk_certificate   <- c("U","PG","12A","12","15","18")
 deu_certificate  <- c("0","6","12","16","18")
 aus_certificate  <- c("G","PG","M","MA","MA15+","R","R18+")
+
+cty <- "us"   # for testing.
 
 for (cty in countries){
   # read the data
@@ -94,7 +96,7 @@ for (cty in countries){
   #svg(paste0(PLOT_DIR,"pg_",cty,"_all.svg"))
   print(ggplot(pg_melt, aes(x=startYear, y=score, color=guide)) + 
     stat_summary(fun=mean, geom="line", size=1)+
-    ggtitle(paste(name,"Parental Guides by Year and Guide")) +
+    ggtitle(paste(name,"All Titles Parental Guides by Year and Guide")) +
     theme(plot.title=element_text(hjust=0.5))+
     xlab("Year")+ylab("Level") + labs(color="Type")+ 
     scale_y_continuous(limits=c(0,3),breaks=c(0,1,2,3),labels=c("None","Mild","Moderate","Severe"))+
@@ -109,7 +111,7 @@ for (cty in countries){
     #svg(paste0(PLOT_DIR,"pg_",cty,"_",gde,".svg"))
     print(ggplot(single_guide , aes(x=startYear, y=score, color=certificate)) + 
             stat_summary(fun=mean, geom="line", size=1)+
-            ggtitle(paste(name,str_to_title(gde),"Rating by Year and Certificate")) +
+            ggtitle(paste(name,"All Titles",str_to_title(gde),"Rating by Year and Certificate")) +
             theme(plot.title=element_text(hjust=0.5))+
             xlab("Year")+ylab("Level") + labs(color="Certificate")+ 
             scale_y_continuous(limits=c(0,3),breaks=c(0,1,2,3),labels=c("None","Mild","Moderate","Severe"))+
