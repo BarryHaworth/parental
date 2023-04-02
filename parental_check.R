@@ -26,6 +26,7 @@ pg_key_count <- pg_keywords %>%
   summarise(key_count=n())
 
 table(pg_key_count$key_count)
+head(pg_key_count %>% arrange(desc(key_count)))
   
 #names(parental_guide)
 names(parental_detail_guide)

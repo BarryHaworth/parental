@@ -24,26 +24,22 @@ load(paste0(DATA_DIR,"parental_guide.RData"))
 guides  <- c("sex","violence","profanity","drugs","intense")  # List of Parental Guide variables
 levels  <- c("None","Mild","Moderate","Severe")
 
-docs  <- pg_keywords$keywords %>%  VectorSource() %>% Corpus() 
+key_tab <- data.frame(table(pg_keywords$keywords),stringsAsFactors = F) %>% rename(keyword=Var1) %>% arrange(desc(Freq))
+key_tab$keyword <- as.character(key_tab$keyword)
 
-customStop <- c()   # Custom Stopwords
-docs <- tm_map(docs, content_transformer(tolower))          # Convert the text to lower case
-docs <- tm_map(docs, removeNumbers)                         # Remove numbers
-docs <- tm_map(docs, removeWords, stopwords("english"))     # Remove common english stopwords
-docs <- tm_map(docs, removeWords, customStop)               # Remove custom stopwords
-docs <- tm_map(docs, removePunctuation)                     # Remove punctuation
-docs <- tm_map(docs, stripWhitespace)                       # Eliminate extra white spaces
+write.csv(key_tab,paste0(DATA_DIR,"keyword_table.csv"),row.names=FALSE)
+
+key_tab <- key_tab[nchar(key_tab$keyword) <=20,] # Filter longer keywords
 
 png(paste0(PLOT_DIR,"keyword_all.png"),width=800,height=800)
 
-layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
-par(mar=rep(0, 4))
-plot.new()
-text(x=0.5, y=0.5, "Keywords All Titles")
-wordcloud(words = docs, min.freq = 1,
+wordcloud(key_tab$keyword,key_tab$Freq,
+          min.freq = 100,
           max.words=200, random.order=FALSE, rot.per=0.35, 
           colors=brewer.pal(8, "Dark2"),
+          scale=c(2, .5),
           main="Title")
+
 dev.off()
 
 for (guide in guides){
@@ -52,25 +48,19 @@ for (guide in guides){
     
     filtered <- parental_guide %>% filter((!!sym(guide))== level)
     keywords <- pg_keywords %>% inner_join(filtered %>% select(tconst))
-    docs     <- keywords$keywords %>%  VectorSource() %>% Corpus() 
-    
-    customStop <- c()   # Custom Stopwords
-    docs <- tm_map(docs, content_transformer(tolower))          # Convert the text to lower case
-    docs <- tm_map(docs, removeNumbers)                         # Remove numbers
-    docs <- tm_map(docs, removeWords, stopwords("english"))     # Remove common english stopwords
-    docs <- tm_map(docs, removeWords, customStop)               # Remove custom stopwords
-    docs <- tm_map(docs, removePunctuation)                     # Remove punctuation
-    docs <- tm_map(docs, stripWhitespace)                       # Eliminate extra white spaces
+    key_tab <- data.frame(table(keywords$keywords)) %>% rename(keyword=Var1) %>% arrange(desc(Freq))
+    key_tab$keyword <- as.character(key_tab$keyword)
+    write.csv(key_tab,paste0(DATA_DIR,"keyword_table_",guide,"_",level,".csv"),row.names=FALSE)
+    key_tab <- key_tab[nchar(key_tab$keyword) <=20,] # Filter longer keywords
     
     png(paste0(PLOT_DIR,"keyword_",guide,"_",level,".png"),width=800,height=800)
     
-    layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
-    par(mar=rep(0, 4))
     plot.new()
-    text(x=0.5, y=0.5, paste("Keywords for",str_to_title(guide),"=",level))
-    wordcloud(words = docs, min.freq = 1,
+    wordcloud(key_tab$keyword,key_tab$Freq,
+              min.freq = 100,
               max.words=200, random.order=FALSE, rot.per=0.35, 
               colors=brewer.pal(8, "Dark2"),
+              scale=c(2, .5),
               main="Title")
     dev.off()
     
