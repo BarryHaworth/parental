@@ -22,7 +22,7 @@ load(paste0(DATA_DIR,"pg_keywords.RData"))
 load(paste0(DATA_DIR,"parental_guide.RData"))
 
 guides  <- c("sex","violence","profanity","drugs","intense")  # List of Parental Guide variables
-levels  <- c("None","Mild","Moderate","Severe")
+levels  <- c("","None","Mild","Moderate","Severe")
 
 key_tab <- data.frame(table(pg_keywords$keywords),stringsAsFactors = F) %>% rename(keyword=Var1) %>% arrange(desc(Freq))
 key_tab$keyword <- as.character(key_tab$keyword)

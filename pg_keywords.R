@@ -1,11 +1,17 @@
 # Code copied from two_goats old code.
 # Rip IMDB to find tags
 # All movies with Parental Guide data
+#
+# Update 05/11/2023
+# Update to keyword ripping to take into account new format
+# PROBLEM - only gets first 50 keywords for each movie.
 
 library(dplyr)
 library(rmutil)
 library(tidyr)
 library(rvest)
+library(xml2)
+library(stringr)
 
 PROJECT_DIR <- "c:/R/parental/"
 DATA_DIR    <- paste0(PROJECT_DIR,"data/")
@@ -17,12 +23,16 @@ load(file=paste0(DATA_DIR,"parental_guide.RData"))
 movie_keys <- function(id){
   url <- paste0('https://www.imdb.com/title/',id,'/keywords')
   webpage <- read_html(url)
-  tag_html <- html_nodes(webpage,'.sodatext')
-  tags <- trimws(gsub('[\n]', '', html_text(tag_html)))
+  tag_html <- html_nodes(webpage,'.ipc-metadata-list-summary-item__t')
+  keyframe <- bind_rows(lapply(xml_attrs(tag_html), function(x) data.frame(as.list(x), stringsAsFactors=FALSE)))
+  href <- keyframe$href
+  tags <- str_extract(href,"(?<=keywords=).*(?=&ref)")
   if (length(tags)==0) tags="No Keywords"
   keywords <- data.frame("tconst"=id,"keywords"=tags)
   return(keywords)
 }
+
+#movie_keys("tt0111161")
 
 # If the saved Movie keywords data exists, read it.
 if (file.exists(paste0(DATA_DIR,"pg_keywords.RData"))) {
